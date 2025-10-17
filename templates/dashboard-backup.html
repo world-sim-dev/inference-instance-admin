@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block nav %}
+<div class="navbar-nav ms-auto">
+    <a class="nav-link" href="#" onclick="logout()">退出登录</a>
+</div>
+{% endblock %}
+
+{% block styles %}
+<!-- 引入复制功能样式 -->
+{% include 'components/copy-styles.html' %}
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Inference Instances 管理</h2>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">
+        新建实例
+    </button>
+</div>
+
+<!-- 筛选器面板 -->
+{% include 'components/filter-panel.html' %}
+
+<!-- 实例列表表格 -->
+{% include 'components/instance-table.html' %}
+
+<!-- 模态框 -->
+{% include 'modals/create-instance-modal.html' %}
+{% include 'modals/history-modal.html' %}
+{% include 'modals/compare-modal.html' %}
+{% endblock %}
+
+{% block scripts %}
+<!-- 引入JavaScript模块 -->
+<script src="/static/js/copy-manager.js"></script>
+<script src="/static/js/dashboard.js"></script>
+{% endblock %}

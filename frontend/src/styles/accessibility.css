@@ -1,0 +1,376 @@
+/**
+ * Accessibility Styles
+ * Enhanced styles for better accessibility and user experience
+ */
+
+/* High Contrast Mode */
+.high-contrast {
+  --primary-color: #000000;
+  --secondary-color: #ffffff;
+  --text-color: #000000;
+  --background-color: #ffffff;
+  --border-color: #000000;
+  --focus-color: #ff0000;
+  --error-color: #ff0000;
+  --success-color: #008000;
+  --warning-color: #ff8c00;
+}
+
+.high-contrast * {
+  background-color: var(--background-color) !important;
+  color: var(--text-color) !important;
+  border-color: var(--border-color) !important;
+}
+
+.high-contrast .ant-btn-primary {
+  background-color: var(--primary-color) !important;
+  color: var(--secondary-color) !important;
+  border-color: var(--primary-color) !important;
+}
+
+.high-contrast .ant-btn-primary:hover {
+  background-color: var(--text-color) !important;
+  color: var(--background-color) !important;
+}
+
+.high-contrast .ant-table-thead > tr > th {
+  background-color: var(--primary-color) !important;
+  color: var(--secondary-color) !important;
+}
+
+.high-contrast .ant-tag {
+  background-color: var(--primary-color) !important;
+  color: var(--secondary-color) !important;
+  border-color: var(--primary-color) !important;
+}
+
+/* Focus Indicators */
+.focus-indicators *:focus {
+  outline: 3px solid var(--focus-color, #1890ff) !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2) !important;
+}
+
+.focus-indicators .ant-btn:focus {
+  outline: 3px solid var(--focus-color, #1890ff) !important;
+  outline-offset: 2px !important;
+}
+
+.focus-indicators .ant-input:focus {
+  outline: 3px solid var(--focus-color, #1890ff) !important;
+  outline-offset: 2px !important;
+  border-color: var(--focus-color, #1890ff) !important;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2) !important;
+}
+
+.focus-indicators .ant-select:focus {
+  outline: 3px solid var(--focus-color, #1890ff) !important;
+  outline-offset: 2px !important;
+}
+
+/* Skip Links */
+.skip-link {
+  position: absolute;
+  left: -10000px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  z-index: 999999;
+  padding: 8px 16px;
+  background-color: #000;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 0 0 4px 4px;
+  font-weight: bold;
+}
+
+.skip-link:focus {
+  left: 6px !important;
+  top: 6px !important;
+  width: auto !important;
+  height: auto !important;
+  overflow: visible !important;
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Screen Reader Only */
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.sr-only-focusable:focus {
+  position: static !important;
+  width: auto !important;
+  height: auto !important;
+  padding: inherit !important;
+  margin: inherit !important;
+  overflow: visible !important;
+  clip: auto !important;
+  white-space: inherit !important;
+}
+
+/* Enhanced Button States */
+.ant-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.ant-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Loading States */
+.loading-overlay {
+  position: relative;
+}
+
+.loading-overlay::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.8);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Skeleton Loading Animation */
+@keyframes skeleton-loading {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+.skeleton-loading {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200px 100%;
+  animation: skeleton-loading 1.5s infinite;
+}
+
+/* Improved Form Validation */
+.ant-form-item-has-error .ant-input {
+  border-color: #ff4d4f !important;
+  box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.2) !important;
+}
+
+.ant-form-item-has-error .ant-input:focus {
+  border-color: #ff4d4f !important;
+  box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.2) !important;
+  outline: 2px solid #ff4d4f !important;
+  outline-offset: 2px !important;
+}
+
+/* Success States */
+.ant-form-item-has-success .ant-input {
+  border-color: #52c41a !important;
+  box-shadow: 0 0 0 2px rgba(82, 196, 26, 0.2) !important;
+}
+
+/* Tooltip Improvements */
+.ant-tooltip {
+  max-width: 300px;
+}
+
+.ant-tooltip-inner {
+  padding: 8px 12px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+/* Modal Improvements */
+.ant-modal-mask {
+  backdrop-filter: blur(4px);
+}
+
+.ant-modal {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+/* Table Improvements */
+.ant-table-tbody > tr:hover > td {
+  background: rgba(24, 144, 255, 0.04) !important;
+}
+
+.ant-table-tbody > tr.ant-table-row-selected > td {
+  background: rgba(24, 144, 255, 0.08) !important;
+}
+
+/* Card Improvements */
+.ant-card {
+  transition: all 0.3s ease;
+}
+
+.ant-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+/* Notification Improvements */
+.ant-notification {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  border-radius: 8px;
+}
+
+.ant-notification-notice {
+  border-radius: 8px;
+}
+
+/* Progress Indicators */
+.progress-bar {
+  width: 100%;
+  height: 4px;
+  background: #f0f0f0;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #1890ff, #40a9ff);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+/* Keyboard Navigation Hints */
+.keyboard-hint {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #1890ff;
+  color: white;
+  font-size: 10px;
+  padding: 2px 4px;
+  border-radius: 2px;
+  font-family: monospace;
+  z-index: 10;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.keyboard-navigation .keyboard-hint {
+  opacity: 1;
+}
+
+/* Print Styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .ant-btn,
+  .ant-pagination,
+  .ant-modal-mask,
+  .ant-drawer-mask {
+    display: none !important;
+  }
+  
+  .ant-table {
+    font-size: 12px;
+  }
+  
+  .ant-card {
+    border: 1px solid #000;
+    box-shadow: none;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background-color: #141414;
+    --text-color: #ffffff;
+    --border-color: #434343;
+    --focus-color: #1890ff;
+  }
+}
+
+/* Animation Utilities */
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.slide-in-right {
+  animation: slideInRight 0.3s ease-in-out;
+}
+
+.slide-in-left {
+  animation: slideInLeft 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes slideInLeft {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+/* Responsive Improvements */
+@media (max-width: 768px) {
+  .ant-modal {
+    margin: 16px;
+    max-width: calc(100vw - 32px);
+  }
+  
+  .ant-drawer-content-wrapper {
+    width: 100vw !important;
+  }
+  
+  .accessibility-toolbar {
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+    flex-direction: column;
+  }
+}
+
+/* Performance Optimizations */
+.will-change-transform {
+  will-change: transform;
+}
+
+.will-change-opacity {
+  will-change: opacity;
+}
+
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}

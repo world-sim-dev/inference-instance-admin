@@ -1,0 +1,198 @@
+/**
+ * InstanceTable Component Styles
+ */
+
+/* Row styling for different instance states */
+.ant-table-tbody > tr.ephemeral-instance {
+  background-color: #f6ffed;
+  border-left: 3px solid #52c41a;
+}
+
+.ant-table-tbody > tr.ephemeral-instance:hover {
+  background-color: #f0f9e8 !important;
+}
+
+.ant-table-tbody > tr.error-instance {
+  background-color: #fff2f0;
+  border-left: 3px solid #ff4d4f;
+}
+
+.ant-table-tbody > tr.error-instance:hover {
+  background-color: #ffebe8 !important;
+}
+
+/* Status tag styling */
+.ant-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-radius: 4px;
+  padding: 2px 6px;
+}
+
+/* Action buttons styling */
+.ant-table-tbody .ant-btn {
+  border: none;
+  box-shadow: none;
+  transition: all 0.2s ease;
+}
+
+.ant-table-tbody .ant-btn:hover {
+  background-color: #f0f0f0;
+  transform: scale(1.1);
+}
+
+.ant-table-tbody .ant-btn.ant-btn-dangerous:hover {
+  background-color: #fff2f0;
+  color: #ff4d4f;
+}
+
+/* Responsive table adjustments */
+@media (max-width: 768px) {
+  .ant-table-thead > tr > th {
+    padding: 8px 4px;
+    font-size: 12px;
+  }
+  
+  .ant-table-tbody > tr > td {
+    padding: 8px 4px;
+    font-size: 12px;
+  }
+  
+  .ant-table-tbody .ant-btn {
+    padding: 2px 4px;
+    min-width: 24px;
+    height: 24px;
+  }
+}
+
+/* Table scroll shadows */
+.ant-table-container::before,
+.ant-table-container::after {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 1;
+  width: 30px;
+  transition: box-shadow 0.3s;
+  content: '';
+  pointer-events: none;
+}
+
+.ant-table-container::before {
+  left: 0;
+}
+
+.ant-table-container::after {
+  right: 0;
+}
+
+.ant-table-ping-left::before {
+  box-shadow: inset 10px 0 8px -8px rgba(0, 0, 0, 0.15);
+}
+
+.ant-table-ping-right::after {
+  box-shadow: inset -10px 0 8px -8px rgba(0, 0, 0, 0.15);
+}
+
+/* Loading state styling */
+.ant-table-tbody > tr.ant-table-placeholder:hover > td {
+  background: transparent !important;
+}
+
+/* Empty state styling */
+.ant-empty {
+  margin: 32px 0;
+}
+
+.ant-empty-description {
+  color: #8c8c8c;
+  font-size: 14px;
+}
+
+/* Tooltip styling for truncated content */
+.ant-tooltip-inner {
+  max-width: 300px;
+  word-wrap: break-word;
+}
+
+/* Priority and resource info styling */
+.instance-resource-info {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 11px;
+  color: #666;
+  background-color: #f5f5f5;
+  padding: 2px 4px;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+/* Status icon animations */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.ant-tag .anticon {
+  font-size: 10px;
+}
+
+.ant-tag .anticon.anticon-play-circle {
+  color: #52c41a;
+}
+
+.ant-tag .anticon.anticon-pause-circle {
+  color: #8c8c8c;
+}
+
+/* Compact table styling for mobile */
+.ant-table-small .ant-table-thead > tr > th {
+  background-color: #fafafa;
+  font-weight: 600;
+  font-size: 11px;
+  padding: 6px 4px;
+}
+
+.ant-table-small .ant-table-tbody > tr > td {
+  padding: 6px 4px;
+}
+
+/* Highlight search results */
+.search-highlight {
+  background-color: #fff2b8;
+  padding: 0 2px;
+  border-radius: 2px;
+}
+
+/* Table header sorting indicators */
+.ant-table-column-sorter {
+  color: #bfbfbf;
+}
+
+.ant-table-column-sorter-up.active,
+.ant-table-column-sorter-down.active {
+  color: #1890ff;
+}
+
+/* Custom scrollbar for table */
+.ant-table-body::-webkit-scrollbar {
+  height: 6px;
+}
+
+.ant-table-body::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.ant-table-body::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.ant-table-body::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}

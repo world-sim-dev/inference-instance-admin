@@ -1,0 +1,428 @@
+<!-- 创建/编辑实例模态框 - 增强验证版本 -->
+<div class="modal fade" id="createModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">新建实例</h5>
+                <div class="validation-summary d-none" id="validationSummary">
+                    <div class="validation-stats">
+                        <div class="validation-stat valid">
+                            <i class="fas fa-check-circle"></i>
+                            <span id="validFieldsCount">0</span> 有效
+                        </div>
+                        <div class="validation-stat invalid">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span id="invalidFieldsCount">0</span> 错误
+                        </div>
+                        <div class="validation-stat warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span id="warningFieldsCount">0</span> 警告
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <!-- 验证进度条 -->
+                <div class="validation-progress d-none" id="validationProgress">
+                    <div class="validation-progress-bar" id="validationProgressBar" style="width: 0%"></div>
+                </div>
+                
+                <form id="instanceForm" data-validate-form="true" novalidate>
+                    <!-- 基本信息组 -->
+                    <div class="field-group mb-4" data-group="basic">
+                        <h6 class="text-muted mb-3">
+                            <i class="fas fa-info-circle"></i> 基本信息
+                        </h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3 field-container">
+                                    <label class="form-label">实例名称 *</label>
+                                    <input type="text" class="form-control" name="name" data-validate="true" required
+                                           placeholder="输入唯一的实例名称">
+                                    <div class="form-text">必须在系统中唯一，只能包含字母、数字、下划线和连字符</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3 field-container">
+                                    <label class="form-label">模型名称 *</label>
+                                    <input type="text" class="form-control" name="model_name" data-validate="true" required
+                                           placeholder="选择或输入模型名称">
+                                    <div class="form-text">从系统中可用的模型中选择</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3 field-container">
+                                    <label class="form-label">模型版本</label>
+                                    <input type="text" class="form-control" name="model_version" value="latest"
+                                           placeholder="模型版本标识">
+                                    <div class="form-text">默认使用最新版本</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3 field-container">
+                                    <label class="form-label">描述</label>
+                                    <input type="text" class="form-control" name="desc" data-validate="true"
+                                           placeholder="实例描述信息">
+                                    <div class="form-text">可选的描述信息，用于文档记录</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 基础设施组 -->
+                    <div class="field-group mb-4" data-group="infrastructure">
+                        <h6 class="text-muted mb-3">
+                            <i class="fas fa-server"></i> 基础设施
+                        </h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3 field-container">
+                                    <label class="form-label">集群名称 *</label>
+                                    <input type="text" class="form-control" name="cluster_name" data-validate="true" required
+                                           placeholder="目标部署集群">
+                                    <div class="form-text">实例将部署到的目标集群</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3 field-container">
+                                    <label class="form-label">镜像标签 *</label>
+                                    <input type="text" class="form-control" name="image_tag" data-validate="true" required
+                                           placeholder="Docker镜像版本">
+                                    <div class="form-text">要部署的Docker镜像版本标签</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3 field-container">
+                                    <label class="form-label">检查点路径</label>
+                                    <input type="text" class="form-control" name="checkpoint_path"
+                                           placeholder="模型检查点文件路径">
+                                    <div class="form-text">可选的特定模型检查点路径</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3 field-container">
+                                    <label class="form-label">随机数</label>
+                                    <input type="text" class="form-control" name="nonce"
+                                           placeholder="部署唯一性标识">
+                                    <div class="form-text">用于部署区分的随机值</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 资源配置组 -->
+                    <div class="field-group mb-4" data-group="resources">
+                        <h6 class="text-muted mb-3">
+                            <i class="fas fa-microchip"></i> 资源配置
+                        </h6>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="mb-3 field-container">
+                                    <label class="form-label">管道并行度 (PP)</label>
+                                    <input type="number" class="form-control" name="pp" data-validate="true" value="1" min="1" max="16">
+                                    <div class="form-text">管道并行阶段数</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3 field-container">
+                                    <label class="form-label">上下文并行度 (CP)</label>
+                                    <input type="number" class="form-control" name="cp" data-validate="true" value="8" min="1" max="64">
+                                    <div class="form-text">上下文并行处理度</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3 field-container">
+                                    <label class="form-label">张量并行度 (TP)</label>
+                                    <input type="number" class="form-control" name="tp" data-validate="true" value="1" min="1" max="16">
+                                    <div class="form-text">张量并行处理度</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3 field-container">
+                                    <label class="form-label">副本数</label>
+                                    <input type="number" class="form-control" name="replicas" data-validate="true" value="1" min="1" max="50">
+                                    <div class="form-text">要部署的副本数量</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3 field-container">
+                                    <label class="form-label">工作进程数</label>
+                                    <input type="number" class="form-control" name="n_workers" data-validate="true" value="1" min="1" max="32">
+                                    <div class="form-text">要启动的工作进程数量</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3 field-container">
+                                    <label class="form-label">任务并发数</label>
+                                    <input type="number" class="form-control" name="task_concurrency" data-validate="true" value="1" min="1" max="100">
+                                    <div class="form-text">最大并发任务数量</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3 field-container">
+                                    <label class="form-label">Celery任务并发数</label>
+                                    <input type="number" class="form-control" name="celery_task_concurrency" data-validate="true" min="1" max="100">
+                                    <div class="form-text">Celery任务的并发数量</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 功能特性组 -->
+                    <div class="field-group mb-4" data-group="features">
+                        <h6 class="text-muted mb-3">
+                            <i class="fas fa-toggle-on"></i> 功能特性
+                        </h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3 field-container">
+                                    <label class="form-label">管道模式</label>
+                                    <select class="form-select" name="pipeline_mode">
+                                        <option value="default">默认</option>
+                                        <option value="text">文本</option>
+                                        <option value="image">图像</option>
+                                        <option value="video">视频</option>
+                                        <option value="audio">音频</option>
+                                        <option value="performer">表演者</option>
+                                    </select>
+                                    <div class="form-text">处理管道配置模式</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3 field-container">
+                                    <label class="form-label">帧率 (FPS)</label>
+                                    <input type="number" class="form-control" name="fps" data-validate="true" min="1" max="120"
+                                           placeholder="目标处理帧率">
+                                    <div class="form-text">目标处理帧率，可选</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3 field-container">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="quant_mode" data-validate="true">
+                                        <label class="form-check-label">量化模式</label>
+                                    </div>
+                                    <div class="form-text">启用模型量化以减少内存使用</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3 field-container">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="distill_mode" data-validate="true">
+                                        <label class="form-check-label">蒸馏模式</label>
+                                    </div>
+                                    <div class="form-text">启用知识蒸馏模式</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3 field-container">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="m405_mode" data-validate="true">
+                                        <label class="form-check-label">M405模式</label>
+                                    </div>
+                                    <div class="form-text">启用M405模型特定优化</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-3 field-container">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="enable_cuda_graph" data-validate="true">
+                                        <label class="form-check-label">CUDA图优化</label>
+                                    </div>
+                                    <div class="form-text">启用CUDA图优化以提升性能</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 视频处理配置组 -->
+                    <div class="field-group mb-4" data-group="video">
+                        <h6 class="text-muted mb-3">
+                            <i class="fas fa-video"></i> 视频处理配置
+                        </h6>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3 field-container">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="separate_video_encode" data-validate="true" checked>
+                                        <label class="form-check-label">独立视频编码</label>
+                                    </div>
+                                    <div class="form-text">使用独立的视频编码进程</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3 field-container">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="separate_video_decode" data-validate="true" checked>
+                                        <label class="form-check-label">独立视频解码</label>
+                                    </div>
+                                    <div class="form-text">使用独立的视频解码进程</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3 field-container">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="separate_t5_encode" data-validate="true" checked>
+                                        <label class="form-check-label">独立T5编码</label>
+                                    </div>
+                                    <div class="form-text">使用独立的T5编码进程</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 存储配置组 -->
+                    <div class="field-group mb-4" data-group="storage">
+                        <h6 class="text-muted mb-3">
+                            <i class="fas fa-database"></i> 存储配置
+                        </h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3 field-container">
+                                    <label class="form-label">VAE存储类型</label>
+                                    <select class="form-select" name="vae_store_type">
+                                        <option value="redis">Redis</option>
+                                        <option value="memory">内存</option>
+                                        <option value="disk">磁盘</option>
+                                    </select>
+                                    <div class="form-text">VAE模型的存储方式</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3 field-container">
+                                    <label class="form-label">T5存储类型</label>
+                                    <select class="form-select" name="t5_store_type">
+                                        <option value="redis">Redis</option>
+                                        <option value="memory">内存</option>
+                                        <option value="disk">磁盘</option>
+                                        <option value="oss">OSS</option>
+                                    </select>
+                                    <div class="form-text">T5模型的存储方式</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 临时实例配置 -->
+                    <div class="field-group mb-4" data-group="ephemeral">
+                        <h6 class="text-muted mb-3">
+                            <i class="fas fa-clock"></i> 临时实例配置
+                        </h6>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3 field-container">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="ephemeral" data-validate="true">
+                                        <label class="form-check-label">临时实例</label>
+                                    </div>
+                                    <div class="form-text">启用后实例将自动清理</div>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="mb-3 field-container">
+                                    <label class="form-label">最小存活时间 (秒)</label>
+                                    <input type="number" class="form-control" name="ephemeral_min_period_seconds" 
+                                           data-validate="true" value="300" min="60" max="86400">
+                                    <div class="form-text">临时实例的最小生存时间</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3 field-container">
+                                    <label class="form-label">临时实例来源</label>
+                                    <input type="text" class="form-control" name="ephemeral_from" 
+                                           placeholder="临时实例的来源标识">
+                                    <div class="form-text">临时实例的创建来源</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3 field-container">
+                                    <label class="form-label">临时实例目标</label>
+                                    <input type="text" class="form-control" name="ephemeral_to" 
+                                           placeholder="临时实例的目标标识">
+                                    <div class="form-text">临时实例的目标用途</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 状态和元数据组 -->
+                    <div class="field-group mb-4" data-group="metadata">
+                        <h6 class="text-muted mb-3">
+                            <i class="fas fa-info"></i> 状态和元数据
+                        </h6>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3 field-container">
+                                    <label class="form-label">实例ID</label>
+                                    <input type="text" class="form-control" name="id" readonly>
+                                    <div class="form-text">系统生成的唯一标识符</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3 field-container">
+                                    <label class="form-label">状态</label>
+                                    <select class="form-select" name="status">
+                                        <option value="active">活跃</option>
+                                        <option value="inactive">非活跃</option>
+                                        <option value="pending">等待中</option>
+                                        <option value="error">错误</option>
+                                    </select>
+                                    <div class="form-text">实例当前状态</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3 field-container">
+                                    <label class="form-label">创建时间</label>
+                                    <input type="text" class="form-control" name="created_at" readonly>
+                                    <div class="form-text">实例创建的时间戳</div>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="mb-3 field-container">
+                                    <label class="form-label">更新时间</label>
+                                    <input type="text" class="form-control" name="updated_at" readonly>
+                                    <div class="form-text">实例最后更新的时间戳</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 高级配置组 -->
+                    <div class="field-group mb-4" data-group="advanced">
+                        <h6 class="text-muted mb-3">
+                            <i class="fas fa-cogs"></i> 高级配置
+                        </h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3 field-container">
+                                    <label class="form-label">环境变量 (JSON)</label>
+                                    <textarea class="form-control" name="envs" data-validate="true" rows="3"
+                                              placeholder='{"KEY": "value"}'></textarea>
+                                    <div class="form-text">JSON格式的环境变量配置</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3 field-container">
+                                    <label class="form-label">优先级列表 (JSON)</label>
+                                    <textarea class="form-control" name="priorities" data-validate="true" rows="3"
+                                              placeholder='["high", "medium", "low"]'></textarea>
+                                    <div class="form-text">JSON格式的优先级配置</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-outline-primary" id="validateFormBtn">
+                    <i class="fas fa-check-circle"></i> 验证表单
+                </button>
+                <button type="button" class="btn btn-primary" id="saveInstanceBtn" disabled>
+                    <i class="fas fa-save"></i> 保存实例
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

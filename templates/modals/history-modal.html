@@ -1,0 +1,56 @@
+<!-- 历史记录模态框 -->
+<div class="modal fade" id="historyModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">实例历史记录</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <select class="form-select" id="historyOperationFilter">
+                            <option value="">所有操作</option>
+                            <option value="create">创建</option>
+                            <option value="update">更新</option>
+                            <option value="delete">删除</option>
+                            <option value="rollback">回滚</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <input type="datetime-local" class="form-control" id="historyStartDate" placeholder="开始时间">
+                    </div>
+                    <div class="col-md-4">
+                        <input type="datetime-local" class="form-control" id="historyEndDate" placeholder="结束时间">
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>操作时间</th>
+                                <th>操作类型</th>
+                                <th>模型名称</th>
+                                <th>集群</th>
+                                <th>副本数</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTable">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <div>
+                        <span id="historyPagination">显示 0 条记录</span>
+                    </div>
+                    <div>
+                        <button class="btn btn-sm btn-outline-secondary" id="historyPrevBtn">上一页</button>
+                        <button class="btn btn-sm btn-outline-secondary" id="historyNextBtn">下一页</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

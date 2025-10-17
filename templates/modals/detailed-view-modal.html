@@ -1,0 +1,106 @@
+<!-- 详细视图模态框 -->
+<div class="modal fade" id="detailedViewModal" tabindex="-1" aria-labelledby="detailedViewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailedViewModalLabel">
+                    <i class="fas fa-info-circle me-2"></i>
+                    实例详细信息
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- 实例基本信息 -->
+                <div class="row mb-3">
+                    <div class="col-md-8">
+                        <h6 id="detailedViewInstanceName" class="text-primary mb-1"></h6>
+                        <p id="detailedViewInstanceDesc" class="text-muted mb-0"></p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <span id="detailedViewInstanceStatus" class="badge fs-6"></span>
+                    </div>
+                </div>
+
+                <!-- 搜索和过滤 -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="field-search">
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-search"></i>
+                                </span>
+                                <input type="text" class="form-control" id="fieldSearchInput" 
+                                       placeholder="搜索字段名称、显示名或值...">
+                                <button class="btn btn-outline-secondary" type="button" id="clearSearchBtn" title="清除搜索">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex gap-2">
+                            <select class="form-select" id="fieldGroupFilter">
+                                <option value="">所有分组</option>
+                            </select>
+                            <div class="btn-group" role="group">
+                                <button class="btn btn-outline-secondary" id="exportFieldsBtn" title="导出字段数据">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                                <button class="btn btn-outline-secondary" id="refreshFieldsBtn" title="刷新数据">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 标签页导航 -->
+                <ul class="nav nav-tabs" id="fieldGroupTabs" role="tablist">
+                    <!-- 标签页将动态生成 -->
+                </ul>
+
+                <!-- 标签页内容 -->
+                <div class="tab-content" id="fieldGroupTabContent">
+                    <!-- 标签页内容将动态生成 -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="me-auto">
+                    <small class="text-muted" id="fieldStatsText">
+                        <!-- Field statistics will be displayed here -->
+                    </small>
+                </div>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-outline-primary" id="copyFromDetailBtn">
+                    <i class="fas fa-copy me-1"></i>复制实例
+                </button>
+                <button type="button" class="btn btn-primary" id="editFromDetailBtn">
+                    <i class="fas fa-edit me-1"></i>编辑实例
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 字段历史模态框 -->
+<div class="modal fade" id="fieldHistoryModal" tabindex="-1" aria-labelledby="fieldHistoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="fieldHistoryModalLabel">
+                    <i class="fas fa-history me-2"></i>
+                    字段变更历史
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="fieldHistoryContent">
+                    <!-- 字段历史内容将动态生成 -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,550 @@
+/* App Layout Styles */
+.app-layout {
+  min-height: 100vh;
+}
+
+.app-content {
+  background: #f0f2f5;
+}
+
+.app-content-inner {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Header Styles */
+.app-header {
+  background: #001529;
+  padding: 0;
+  height: 64px;
+  line-height: 64px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.app-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+  padding: 0 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.app-header-left {
+  display: flex;
+  align-items: center;
+}
+
+.app-logo {
+  display: flex;
+  align-items: center;
+}
+
+.app-title {
+  color: #fff !important;
+  margin: 0 !important;
+  font-size: 20px !important;
+  font-weight: 600 !important;
+}
+
+.app-header-right {
+  display: flex;
+  align-items: center;
+}
+
+.header-action-btn {
+  color: rgba(255, 255, 255, 0.85) !important;
+  border: none !important;
+  height: 40px;
+  width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header-action-btn:hover {
+  color: #fff !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.header-user-btn {
+  color: rgba(255, 255, 255, 0.85) !important;
+  border: none !important;
+  height: 40px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-user-btn:hover {
+  color: #fff !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.header-user-text {
+  font-size: 14px;
+}
+
+/* Mobile Menu Drawer */
+.mobile-menu-drawer .ant-drawer-body {
+  padding: 0;
+}
+
+.mobile-menu-content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-user-info {
+  padding: 24px;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: linear-gradient(135deg, #f6f9fc 0%, #ffffff 100%);
+}
+
+.mobile-user-details {
+  flex: 1;
+}
+
+.mobile-user-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #262626;
+  margin-bottom: 4px;
+}
+
+.mobile-user-role {
+  font-size: 14px;
+  color: #8c8c8c;
+}
+
+.mobile-menu-section {
+  padding: 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.mobile-menu-section:last-child {
+  border-bottom: none;
+  flex: 1;
+}
+
+.mobile-menu-section-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #8c8c8c;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+  padding-left: 4px;
+}
+
+.mobile-menu-item {
+  height: 52px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: left;
+  border-radius: 8px;
+  font-size: 15px;
+  transition: all 0.2s ease;
+}
+
+.mobile-menu-item:hover {
+  background-color: #f5f5f5;
+  transform: translateX(4px);
+}
+
+.mobile-menu-item.ant-btn-dangerous:hover {
+  background-color: #fff2f0;
+  color: #ff4d4f;
+}
+
+.mobile-menu-item .anticon {
+  font-size: 18px;
+  margin-right: 12px;
+}
+
+/* Touch-friendly improvements */
+@media (hover: none) and (pointer: coarse) {
+  .mobile-menu-item {
+    height: 56px;
+    font-size: 16px;
+  }
+  
+  .mobile-menu-item .anticon {
+    font-size: 20px;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .app-header-content {
+    padding: 0 16px;
+  }
+  
+  .app-content-inner {
+    padding: 16px;
+  }
+  
+  .app-title {
+    font-size: 18px !important;
+  }
+  
+  .header-user-text {
+    display: none;
+  }
+  
+  .header-action-btn,
+  .header-user-btn {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+  }
+  
+  /* Hide desktop user dropdown on mobile */
+  .header-user-btn {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-header-content {
+    padding: 0 12px;
+  }
+  
+  .app-content-inner {
+    padding: 12px;
+  }
+  
+  .app-title {
+    font-size: 16px !important;
+  }
+  
+  .header-action-btn {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+/* Tablet responsive adjustments */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .app-content-inner {
+    padding: 20px;
+  }
+  
+  .app-header-content {
+    padding: 0 20px;
+  }
+}
+
+/* Content wrapper */
+.content-wrapper {
+  min-height: calc(100vh - 64px - 48px); /* Full height minus header and padding */
+  background: #fff;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Loading Spinner Overlay */
+.ant-spin-container {
+  min-height: calc(100vh - 64px - 48px);
+}
+
+.ant-spin-spinning {
+  position: relative;
+}
+
+.ant-spin-tip {
+  color: #1890ff;
+  font-size: 14px;
+}
+
+/* Error Alert Styling */
+.ant-alert-error {
+  border-radius: 8px;
+}
+
+/* Dark theme support for header */
+.app-header .ant-dropdown-trigger {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.app-header .ant-dropdown-trigger:hover {
+  color: #fff;
+}
+
+/* Responsive content wrapper */
+@media (max-width: 768px) {
+  .content-wrapper {
+    padding: 16px;
+    border-radius: 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .content-wrapper {
+    padding: 12px;
+    border-radius: 4px;
+  }
+}
+
+/* Loading state improvements */
+.ant-spin-lg .ant-spin-dot {
+  font-size: 32px;
+}
+
+.ant-spin-lg .ant-spin-dot i {
+  width: 22px;
+  height: 22px;
+}
+
+/* Smooth transitions */
+.app-layout,
+.app-content,
+.app-content-inner,
+.content-wrapper {
+  transition: all 0.3s ease;
+}
+
+/* Focus states for accessibility */
+.header-action-btn:focus,
+.header-user-btn:focus,
+.mobile-menu-item:focus {
+  outline: 2px solid #1890ff;
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .app-header {
+    border-bottom: 2px solid #fff;
+  }
+  
+  .content-wrapper {
+    border: 1px solid #d9d9d9;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .app-layout,
+  .app-content,
+  .app-content-inner,
+  .content-wrapper {
+    transition: none;
+  }
+  
+  .ant-spin-dot i {
+    animation-duration: 2s;
+  }
+}
+
+/* Print styles */
+@media print {
+  .app-header {
+    display: none;
+  }
+  
+  .app-content-inner {
+    padding: 0;
+  }
+  
+  .content-wrapper {
+    box-shadow: none;
+    border: 1px solid #000;
+  }
+}
+
+/* Large desktop optimizations */
+@media (min-width: 1600px) {
+  .app-content-inner {
+    max-width: 1600px;
+    padding: 32px;
+  }
+  
+  .content-wrapper {
+    padding: 32px;
+  }
+}
+
+/* Ultra-wide screen support */
+@media (min-width: 2000px) {
+  .app-content-inner {
+    max-width: 1800px;
+  }
+}
+
+/* Small mobile devices */
+@media (max-width: 360px) {
+  .app-header-content {
+    padding: 0 8px;
+  }
+  
+  .app-content-inner {
+    padding: 8px;
+  }
+  
+  .content-wrapper {
+    padding: 8px;
+  }
+  
+  .app-title {
+    font-size: 14px !important;
+  }
+  
+  .header-action-btn {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .mobile-menu-drawer {
+    width: 90vw !important;
+  }
+}
+
+/* Landscape mobile orientation */
+@media (max-height: 500px) and (orientation: landscape) {
+  .app-header {
+    height: 48px;
+    line-height: 48px;
+  }
+  
+  .app-content-inner {
+    padding: 12px;
+  }
+  
+  .content-wrapper {
+    padding: 16px;
+    min-height: calc(100vh - 48px - 24px);
+  }
+  
+  .mobile-user-info {
+    padding: 16px;
+  }
+  
+  .mobile-menu-section {
+    padding: 12px;
+  }
+  
+  .mobile-menu-item {
+    height: 44px;
+    margin-bottom: 6px;
+  }
+}
+
+/* Tablet landscape optimizations */
+@media (min-width: 769px) and (max-width: 1024px) and (orientation: landscape) {
+  .app-content-inner {
+    max-width: 100%;
+    padding: 16px 24px;
+  }
+  
+  .content-wrapper {
+    padding: 20px;
+  }
+}
+
+/* Safe area support for devices with notches */
+@supports (padding: max(0px)) {
+  .app-header {
+    padding-left: max(0px, env(safe-area-inset-left));
+    padding-right: max(0px, env(safe-area-inset-right));
+  }
+  
+  .app-content-inner {
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
+  }
+  
+  @media (max-width: 768px) {
+    .app-content-inner {
+      padding-left: max(12px, env(safe-area-inset-left));
+      padding-right: max(12px, env(safe-area-inset-right));
+      padding-bottom: max(16px, env(safe-area-inset-bottom));
+    }
+  }
+}
+
+/* Improved focus states for keyboard navigation */
+.app-header .header-action-btn:focus-visible,
+.mobile-menu-item:focus-visible {
+  outline: 2px solid #1890ff;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(24, 144, 255, 0.2);
+}
+
+/* Sticky header improvements */
+.app-header {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+@supports (backdrop-filter: blur(8px)) {
+  .app-header {
+    background: rgba(0, 21, 41, 0.95);
+  }
+}
+
+/* Loading state improvements for mobile */
+@media (max-width: 768px) {
+  .ant-spin-container {
+    min-height: calc(100vh - 64px - 32px);
+  }
+  
+  .ant-spin-lg .ant-spin-dot {
+    font-size: 28px;
+  }
+  
+  .ant-spin-lg .ant-spin-dot i {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+/* Improved modal backdrop for mobile */
+@media (max-width: 768px) {
+  .ant-modal-mask {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+}
+
+/* Better scrollbar styling for mobile */
+@media (max-width: 768px) {
+  .content-wrapper::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  .content-wrapper::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .content-wrapper::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 2px;
+  }
+}
+
+/* Prevent zoom on input focus for iOS */
+@media (max-width: 768px) {
+  input[type="text"],
+  input[type="search"],
+  input[type="email"],
+  input[type="password"],
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}

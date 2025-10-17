@@ -1,0 +1,244 @@
+/**
+ * InstanceGrid Component Styles
+ * Responsive grid layout styling
+ */
+
+/* Grid container */
+.instance-grid-container {
+  width: 100%;
+}
+
+.instance-grid {
+  margin: 0;
+}
+
+.instance-grid-col {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Ensure cards fill the column height */
+.instance-grid-col .instance-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.instance-grid-col .ant-card-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Loading state */
+.instance-grid-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  padding: 40px 20px;
+}
+
+/* Empty state */
+.instance-grid-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  padding: 40px 20px;
+}
+
+/* Grid footer */
+.instance-grid-footer {
+  margin-top: 16px;
+  padding: 12px 0;
+  text-align: center;
+  border-top: 1px solid #f0f0f0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .instance-grid-container {
+    padding: 0 4px;
+  }
+  
+  .instance-grid-loading,
+  .instance-grid-empty {
+    min-height: 250px;
+    padding: 30px 15px;
+  }
+  
+  .instance-grid-footer {
+    margin-top: 12px;
+    padding: 8px 0;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .instance-grid-container {
+    padding: 0 8px;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .instance-grid-container {
+    padding: 0 12px;
+  }
+}
+
+/* Masonry-like layout for varying card heights */
+@supports (display: grid) {
+  @media (min-width: 1024px) {
+    .instance-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+      margin: 0;
+    }
+    
+    .instance-grid-col {
+      display: contents;
+    }
+    
+    .instance-grid .instance-card {
+      margin-bottom: 0;
+    }
+  }
+  
+  @media (min-width: 1400px) {
+    .instance-grid {
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 24px;
+    }
+  }
+}
+
+/* Animation for grid items */
+.instance-grid-col {
+  animation: gridItemEnter 0.4s ease-out;
+}
+
+@keyframes gridItemEnter {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Staggered animation for grid items */
+.instance-grid-col:nth-child(1) { animation-delay: 0ms; }
+.instance-grid-col:nth-child(2) { animation-delay: 100ms; }
+.instance-grid-col:nth-child(3) { animation-delay: 200ms; }
+.instance-grid-col:nth-child(4) { animation-delay: 300ms; }
+.instance-grid-col:nth-child(5) { animation-delay: 400ms; }
+.instance-grid-col:nth-child(6) { animation-delay: 500ms; }
+.instance-grid-col:nth-child(n+7) { animation-delay: 600ms; }
+
+/* Disable animations for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .instance-grid-col {
+    animation: none;
+  }
+}
+
+/* Loading spinner overlay */
+.ant-spin-container {
+  position: relative;
+}
+
+.ant-spin-spinning .instance-grid {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .instance-grid-footer {
+    border-top-color: #000;
+  }
+}
+
+/* Dark theme support */
+@media (prefers-color-scheme: dark) {
+  .instance-grid-footer {
+    border-top-color: #434343;
+  }
+}
+
+/* Print styles */
+@media print {
+  .instance-grid {
+    display: block !important;
+  }
+  
+  .instance-grid-col {
+    display: block !important;
+    break-inside: avoid;
+    margin-bottom: 10px;
+  }
+  
+  .instance-grid-footer {
+    display: none;
+  }
+}
+
+/* Smooth transitions for layout changes */
+.instance-grid-container {
+  transition: padding 0.3s ease;
+}
+
+.instance-grid {
+  transition: gap 0.3s ease;
+}
+
+/* Focus management for accessibility */
+.instance-grid-col:focus-within {
+  outline: 2px solid #1890ff;
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
+/* Hover effects for desktop */
+@media (hover: hover) and (pointer: fine) {
+  .instance-grid-col:hover .instance-card {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .instance-grid {
+    gap: 16px;
+  }
+  
+  .instance-grid-col .instance-card {
+    margin-bottom: 0;
+  }
+}
+
+/* Ultra-wide screen optimizations */
+@media (min-width: 1800px) {
+  .instance-grid {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 28px;
+  }
+}
+
+/* Very small mobile devices */
+@media (max-width: 360px) {
+  .instance-grid-container {
+    padding: 0 2px;
+  }
+  
+  .instance-grid-loading,
+  .instance-grid-empty {
+    min-height: 200px;
+    padding: 20px 10px;
+  }
+}

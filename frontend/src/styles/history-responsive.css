@@ -1,0 +1,304 @@
+/**
+ * Responsive styles for history components
+ * Optimized for mobile, tablet, and desktop experiences
+ */
+
+/* Base styles for all devices */
+.history-modal {
+  --history-item-padding: 12px 16px;
+  --history-item-border: 1px solid #f0f0f0;
+  --history-item-hover: #fafafa;
+  --history-item-active: #f0f0f0;
+}
+
+/* Mobile styles (< 768px) */
+@media (max-width: 767px) {
+  .history-modal {
+    --history-item-padding: 16px 20px;
+  }
+
+  .history-modal .ant-modal {
+    margin: 0;
+    max-width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+  }
+
+  .history-modal .ant-modal-content {
+    height: 100vh;
+    border-radius: 0;
+  }
+
+  .history-modal .ant-modal-body {
+    padding: 16px;
+    height: calc(100vh - 110px);
+    overflow: hidden;
+  }
+
+  .history-modal .ant-modal-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .history-modal .ant-modal-footer {
+    padding: 16px 20px;
+    border-top: 1px solid #f0f0f0;
+  }
+
+  /* Touch-friendly buttons */
+  .history-modal .ant-btn {
+    min-height: 44px;
+    font-size: 16px;
+    border-radius: 8px;
+  }
+
+  /* Larger touch targets for checkboxes */
+  .history-modal .ant-checkbox-wrapper {
+    padding: 8px;
+    margin: -8px;
+  }
+
+  /* Improved spacing for mobile */
+  .history-modal .ant-space-item {
+    margin-bottom: 8px;
+  }
+
+  /* Better text sizing */
+  .history-modal .ant-typography {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  .history-modal .ant-typography-caption {
+    font-size: 14px;
+  }
+}
+
+/* Tablet styles (768px - 1199px) */
+@media (min-width: 768px) and (max-width: 1199px) {
+  .history-modal {
+    --history-item-padding: 14px 18px;
+  }
+
+  .history-modal .ant-modal {
+    margin: 20px auto;
+    max-width: 95vw;
+  }
+
+  .history-modal .ant-modal-body {
+    padding: 20px;
+    max-height: 75vh;
+  }
+
+  /* Touch-friendly elements for tablets */
+  .history-modal .ant-btn {
+    min-height: 40px;
+    font-size: 15px;
+    padding: 8px 16px;
+  }
+
+  .history-modal .ant-select,
+  .history-modal .ant-picker {
+    min-height: 40px;
+  }
+
+  /* Better spacing for tablet */
+  .history-modal .ant-row {
+    margin-bottom: 16px;
+  }
+}
+
+/* Desktop styles (>= 1200px) */
+@media (min-width: 1200px) {
+  .history-modal .ant-modal {
+    max-width: 1200px;
+  }
+
+  .history-modal .ant-modal-body {
+    padding: 24px;
+    max-height: 70vh;
+  }
+}
+
+/* History list item styles */
+.history-list-item {
+  padding: var(--history-item-padding);
+  border-bottom: var(--history-item-border);
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.history-list-item:hover {
+  background-color: var(--history-item-hover);
+}
+
+.history-list-item:active {
+  background-color: var(--history-item-active);
+}
+
+.history-list-item.compare-mode {
+  cursor: default;
+}
+
+.history-list-item.selected {
+  background-color: #e6f7ff;
+  border-left: 3px solid #1890ff;
+}
+
+/* Touch feedback for mobile */
+@media (max-width: 767px) {
+  .history-list-item:active {
+    background-color: #f0f0f0;
+    transform: scale(0.98);
+    transition: all 0.1s ease;
+  }
+}
+
+/* Virtualized list container */
+.history-virtualized-container {
+  scrollbar-width: thin;
+  scrollbar-color: #d9d9d9 transparent;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  overscroll-behavior: contain;
+}
+
+.history-virtualized-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.history-virtualized-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.history-virtualized-container::-webkit-scrollbar-thumb {
+  background-color: #d9d9d9;
+  border-radius: 3px;
+}
+
+.history-virtualized-container::-webkit-scrollbar-thumb:hover {
+  background-color: #bfbfbf;
+}
+
+/* Mobile drawer styles */
+.history-mobile-drawer .ant-drawer-content {
+  border-radius: 16px 16px 0 0;
+}
+
+.history-mobile-drawer .ant-drawer-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.history-mobile-drawer .ant-drawer-body {
+  padding: 0;
+}
+
+/* Filters drawer */
+.history-filters-drawer .ant-drawer-content {
+  border-radius: 16px 16px 0 0;
+}
+
+.history-filters-drawer .ant-space-vertical {
+  width: 100%;
+}
+
+.history-filters-drawer .ant-space-vertical > .ant-space-item {
+  width: 100%;
+}
+
+/* Comparison view styles */
+.history-comparison-mobile {
+  padding: 16px;
+}
+
+.history-comparison-mobile .ant-card {
+  margin-bottom: 16px;
+  border-radius: 12px;
+}
+
+.history-comparison-mobile .ant-typography-title {
+  font-size: 18px;
+  margin-bottom: 12px;
+}
+
+/* Loading states */
+.history-loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.history-loading-container .ant-spin {
+  margin-bottom: 16px;
+}
+
+/* Empty state */
+.history-empty-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+}
+
+/* Summary info */
+.history-summary {
+  padding: 16px;
+  border-top: 1px solid #f0f0f0;
+  background-color: #fafafa;
+}
+
+@media (max-width: 767px) {
+  .history-summary {
+    padding: 20px;
+    font-size: 14px;
+  }
+}
+
+/* Animation for smooth transitions */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.history-item-enter {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .history-modal {
+    --history-item-border: 2px solid #000;
+    --history-item-hover: #e0e0e0;
+    --history-item-active: #d0d0d0;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .history-list-item,
+  .history-virtualized-container,
+  .history-item-enter {
+    transition: none;
+    animation: none;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .history-modal {
+    --history-item-border: 1px solid #303030;
+    --history-item-hover: #262626;
+    --history-item-active: #1f1f1f;
+  }
+}
