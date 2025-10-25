@@ -23,6 +23,7 @@ export interface InstanceGridProps {
   onDelete?: (instance: Instance) => void;
   onViewHistory?: (instance: Instance) => void;
   onViewDetails?: (instance: Instance) => void;
+  onCopy?: (instance: Instance) => void;
   onRefresh?: () => void;
   emptyText?: string;
   showRefreshButton?: boolean;
@@ -38,6 +39,7 @@ export const InstanceGrid: React.FC<InstanceGridProps> = React.memo(({
   onDelete,
   onViewHistory,
   onViewDetails,
+  onCopy,
   onRefresh,
   emptyText = '暂无实例数据',
   showRefreshButton = true,
@@ -60,6 +62,10 @@ export const InstanceGrid: React.FC<InstanceGridProps> = React.memo(({
   const handleViewDetails = useCallback((instance: Instance) => {
     onViewDetails?.(instance);
   }, [onViewDetails]);
+
+  const handleCopy = useCallback((instance: Instance) => {
+    onCopy?.(instance);
+  }, [onCopy]);
 
   const handleRefresh = useCallback(() => {
     onRefresh?.();
@@ -159,6 +165,7 @@ export const InstanceGrid: React.FC<InstanceGridProps> = React.memo(({
                 onDelete={handleDelete}
                 onViewHistory={handleViewHistory}
                 onViewDetails={handleViewDetails}
+                onCopy={handleCopy}
               />
             </Col>
           ))}

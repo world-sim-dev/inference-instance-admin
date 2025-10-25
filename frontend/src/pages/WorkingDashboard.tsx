@@ -5,21 +5,19 @@
 
 import React, { useState, useEffect } from 'react';
 import { Layout, Card, Button, Space, Typography, Alert, Spin, Table, Tag, Input, Modal, Descriptions, Divider, Form, InputNumber, Select, Switch, message } from 'antd';
-import { PlusOutlined, ReloadOutlined, EyeOutlined, EditOutlined, DeleteOutlined, HistoryOutlined, SearchOutlined, CloseOutlined, SaveOutlined } from '@ant-design/icons';
+import { PlusOutlined, ReloadOutlined, EyeOutlined, EditOutlined, DeleteOutlined, HistoryOutlined, SearchOutlined, CloseOutlined, SaveOutlined, CopyOutlined } from '@ant-design/icons';
 import { CreateInstanceModal } from '../components/modals/CreateInstanceModal';
 import { useAppContext } from '../contexts/useAppContext';
 import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
 import { HistoryModal } from '../components/modals/HistoryModal';
+import { apiClient } from '../services/api';
 
 const { Header, Content } = Layout;
 const { Title } = Typography;
 
-// API function to fetch instances
+// API function to fetch instances using configured API client
 const fetchInstances = async () => {
-  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
-  const response = await axios.get(`${apiBaseUrl}/api/instances/`);
-  return response.data;
+  return await apiClient.getInstances();
 };
 
 export const WorkingDashboard: React.FC = () => {
@@ -110,8 +108,7 @@ export const WorkingDashboard: React.FC = () => {
     
     try {
       console.log('开始删除实例:', instanceToDelete.id);
-      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
-      await axios.delete(`${apiBaseUrl}/api/instances/${instanceToDelete.id}`);
+      await apiClient.deleteInstance(instanceToDelete.id);
       
       // 刷新数据
       refetch();
@@ -133,6 +130,21 @@ export const WorkingDashboard: React.FC = () => {
   const handleViewHistory = (instance: any) => {
     setSelectedInstance(instance);
     setHistoryModalVisible(true);
+  };
+
+  const handleCopyInstance = async (instance: any) => {
+    try {
+      const copiedInstance = await apiClient.copyInstance(instance.id);
+      
+      // 刷新数据
+      refetch();
+      
+      message.success(`实例 "${copiedInstance.name}" 复制成功！`);
+    } catch (error: any) {
+      console.error('复制实例失败:', error);
+      const errorMessage = error.response?.data?.detail || error.response?.data?.message || error.message || '复制实例失败';
+      message.error(`复制实例失败: ${errorMessage}`);
+    }
   };
 
   // Table columns configuration
@@ -184,27 +196,17 @@ export const WorkingDashboard: React.FC = () => {
       ],
       onFilter: (value: any, record: any) => record.status === value,
     },
-    {
-      title: '资源配置',
-      key: 'resources',
-      width: 120,
-      render: (_: any, record: any) => (
-        <div style={{ fontSize: '12px' }}>
-          <div>PP:{record.pp} CP:{record.cp} TP:{record.tp}</div>
-          <div>Workers:{record.n_workers} × {record.replicas}</div>
-        </div>
-      ),
-    },
+
     {
       title: '模式',
       key: 'modes',
       width: 100,
       render: (_: any, record: any) => (
         <Space direction="vertical" size={2}>
-          {record.quant_mode && <Tag size="small" color="purple">量化</Tag>}
-          {record.distill_mode && <Tag size="small" color="cyan">蒸馏</Tag>}
-          {record.m405_mode && <Tag size="small" color="orange">M405</Tag>}
-          {record.ephemeral && <Tag size="small" color="blue">临时</Tag>}
+          {record.quant_mode && <Tag color="purple">量化</Tag>}
+          {record.distill_mode && <Tag color="cyan">蒸馏</Tag>}
+          {record.m405_mode && <Tag color="orange">M405</Tag>}
+          {record.ephemeral && <Tag color="blue">临时</Tag>}
         </Space>
       ),
     },
@@ -219,7 +221,7 @@ export const WorkingDashboard: React.FC = () => {
     {
       title: '操作',
       key: 'actions',
-      width: 160,
+      width: 200,
       fixed: 'right' as const,
       render: (_: any, record: any) => (
         <Space size="small">
@@ -236,6 +238,14 @@ export const WorkingDashboard: React.FC = () => {
             icon={<EditOutlined />}
             onClick={() => handleEditInstance(record)}
             title="编辑"
+          />
+          <Button 
+            type="text" 
+            size="small" 
+            icon={<CopyOutlined />}
+            onClick={() => handleCopyInstance(record)}
+            title="复制实例"
+            style={{ color: '#52c41a' }}
           />
           <Button 
             type="text" 
@@ -475,11 +485,6 @@ export const WorkingDashboard: React.FC = () => {
                   {selectedInstance.m405_mode ? '启用' : '禁用'}
                 </Tag>
               </Descriptions.Item>
-              <Descriptions.Item label="临时实例">
-                <Tag color={selectedInstance.ephemeral ? 'blue' : 'default'}>
-                  {selectedInstance.ephemeral ? '是' : '否'}
-                </Tag>
-              </Descriptions.Item>
               <Descriptions.Item label="CUDA图优化">
                 <Tag color={selectedInstance.enable_cuda_graph ? 'green' : 'default'}>
                   {selectedInstance.enable_cuda_graph ? '启用' : '禁用'}
@@ -489,6 +494,49 @@ export const WorkingDashboard: React.FC = () => {
                 <Tag color={selectedInstance.separate_video_encode ? 'green' : 'default'}>
                   {selectedInstance.separate_video_encode ? '启用' : '禁用'}
                 </Tag>
+              </Descriptions.Item>
+              <Descriptions.Item label="分离视频解码">
+                <Tag color={selectedInstance.separate_video_decode ? 'green' : 'default'}>
+                  {selectedInstance.separate_video_decode ? '启用' : '禁用'}
+                </Tag>
+              </Descriptions.Item>
+              <Descriptions.Item label="分离T5编码">
+                <Tag color={selectedInstance.separate_t5_encode ? 'green' : 'default'}>
+                  {selectedInstance.separate_t5_encode ? '启用' : '禁用'}
+                </Tag>
+              </Descriptions.Item>
+            </Descriptions>
+
+            <Divider />
+
+            <Descriptions title="临时实例配置" bordered column={2} size="small">
+              <Descriptions.Item label="临时实例">
+                <Tag color={selectedInstance.ephemeral ? 'blue' : 'default'}>
+                  {selectedInstance.ephemeral ? '是' : '否'}
+                </Tag>
+              </Descriptions.Item>
+              <Descriptions.Item label="最小存活时间">
+                {selectedInstance.ephemeral_min_period_seconds ? 
+                  `${selectedInstance.ephemeral_min_period_seconds} 秒` : 
+                  '未设置'
+                }
+              </Descriptions.Item>
+              <Descriptions.Item label="ephemeral来源">
+                {selectedInstance.ephemeral_from || '未设置'}
+              </Descriptions.Item>
+              <Descriptions.Item label="ephemeral目标">
+                {selectedInstance.ephemeral_to || '未设置'}
+              </Descriptions.Item>
+            </Descriptions>
+
+            <Divider />
+
+            <Descriptions title="存储配置" bordered column={2} size="small">
+              <Descriptions.Item label="VAE存储类型">
+                {selectedInstance.vae_store_type || 'redis'}
+              </Descriptions.Item>
+              <Descriptions.Item label="T5存储类型">
+                {selectedInstance.t5_store_type || 'redis'}
               </Descriptions.Item>
             </Descriptions>
 

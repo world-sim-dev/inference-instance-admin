@@ -170,6 +170,30 @@ export const Dashboard: React.FC = React.memo(() => {
   }, [actions]);
 
   /**
+   * Handle copy instance
+   */
+  const handleCopy = useCallback(async (instance: Instance) => {
+    const loadingKey = showLoading(`正在复制实例 "${instance.name}"...`);
+    try {
+      // Import API client dynamically to avoid circular dependencies
+      const { apiClient } = await import('../services/api');
+      const copiedInstance = await apiClient.copyInstance(instance.id);
+      updateLoadingSuccess(loadingKey, `实例复制成功`);
+      showSuccess(`实例 "${copiedInstance.name}" 复制成功`, {
+        description: `已从 "${instance.name}" 复制创建新实例`,
+        duration: 5,
+      });
+      refetch();
+    } catch (error: any) {
+      updateLoadingError(loadingKey, '复制失败');
+      showError(`复制实例失败: ${error.message}`, {
+        description: '请检查网络连接或联系系统管理员',
+        duration: 8,
+      });
+    }
+  }, [showLoading, updateLoadingSuccess, updateLoadingError, showSuccess, showError, refetch]);
+
+  /**
    * Handle refresh
    */
   const handleRefresh = useCallback(async () => {
@@ -404,6 +428,7 @@ export const Dashboard: React.FC = React.memo(() => {
               onDelete={handleDelete}
               onViewHistory={handleViewHistory}
               onViewDetails={handleViewDetails}
+              onCopy={handleCopy}
             />
           </Suspense>
         ) : (
@@ -416,6 +441,7 @@ export const Dashboard: React.FC = React.memo(() => {
             onDelete={handleDelete}
             onViewHistory={handleViewHistory}
             onViewDetails={handleViewDetails}
+            onCopy={handleCopy}
           />
         )}
 

@@ -117,7 +117,7 @@ const sampleRecords: HistoryRecord[] = [
     enable_cuda_graph: false,
     task_concurrency: 2,
     celery_task_concurrency: null,
-    status: 'pending',
+    status: 'inactive',
     created_at: '2024-01-16T14:20:00Z',
     updated_at: '2024-01-16T14:20:00Z'
   },

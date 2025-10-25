@@ -13,7 +13,8 @@ import {
   HistoryOutlined, 
   EyeOutlined,
   PlayCircleOutlined,
-  PauseCircleOutlined 
+  PauseCircleOutlined,
+  CopyOutlined
 } from '@ant-design/icons';
 import type { ColumnsType, TableProps } from 'antd/es/table';
 import type { Instance } from '../../types/instance';
@@ -36,6 +37,7 @@ export interface InstanceTableProps {
   onDelete?: (instance: Instance) => void;
   onViewHistory?: (instance: Instance) => void;
   onViewDetails?: (instance: Instance) => void;
+  onCopy?: (instance: Instance) => void;
 }
 
 /**
@@ -47,10 +49,6 @@ const getStatusColor = (status: string): string => {
       return 'green';
     case Status.INACTIVE:
       return 'default';
-    case Status.PENDING:
-      return 'orange';
-    case Status.ERROR:
-      return 'red';
     default:
       return 'default';
   }
@@ -65,10 +63,6 @@ const getStatusIcon = (status: string) => {
       return <PlayCircleOutlined />;
     case Status.INACTIVE:
       return <PauseCircleOutlined />;
-    case Status.PENDING:
-      return <PlayCircleOutlined spin />;
-    case Status.ERROR:
-      return <PauseCircleOutlined />;
     default:
       return null;
   }
@@ -82,12 +76,7 @@ const formatPriorities = (priorities: string[]): string => {
   return priorities.slice(0, 2).join(', ') + (priorities.length > 2 ? '...' : '');
 };
 
-/**
- * Format resource allocation for display
- */
-const formatResources = (instance: Instance): string => {
-  return `PP:${instance.pp} CP:${instance.cp} TP:${instance.tp}`;
-};
+
 
 /**
  * InstanceTable Component - Memoized for performance
@@ -101,6 +90,7 @@ export const InstanceTable: React.FC<InstanceTableProps> = React.memo(({
   onDelete,
   onViewHistory,
   onViewDetails,
+  onCopy,
 }) => {
   const { isMobile, isTablet } = useResponsive();
 
@@ -120,6 +110,10 @@ export const InstanceTable: React.FC<InstanceTableProps> = React.memo(({
   const handleViewDetails = useCallback((instance: Instance) => {
     onViewDetails?.(instance);
   }, [onViewDetails]);
+
+  const handleCopy = useCallback((instance: Instance) => {
+    onCopy?.(instance);
+  }, [onCopy]);
 
   /**
    * Table columns configuration
@@ -182,18 +176,6 @@ export const InstanceTable: React.FC<InstanceTableProps> = React.memo(({
         sorter: (a, b) => a.cluster_name.localeCompare(b.cluster_name),
       },
       {
-        title: 'Resources',
-        key: 'resources',
-        width: 120,
-        render: (_, record: Instance) => (
-          <Tooltip title={`Pipeline: ${record.pp}, Context: ${record.cp}, Tensor: ${record.tp}`}>
-            <Text style={{ fontSize: '12px' }}>
-              {formatResources(record)}
-            </Text>
-          </Tooltip>
-        ),
-      },
-      {
         title: 'Workers',
         key: 'workers',
         width: 100,
@@ -236,7 +218,7 @@ export const InstanceTable: React.FC<InstanceTableProps> = React.memo(({
         title: 'Actions',
         key: 'actions',
         fixed: 'right',
-        width: isMobile ? 80 : 160,
+        width: isMobile ? 80 : 200,
         render: (_, record: Instance) => (
           <Space size="small">
             {onViewDetails && (
@@ -256,6 +238,16 @@ export const InstanceTable: React.FC<InstanceTableProps> = React.memo(({
                   size="small"
                   icon={<EditOutlined />}
                   onClick={() => handleEdit(record)}
+                />
+              </Tooltip>
+            )}
+            {onCopy && (
+              <Tooltip title="Copy Instance">
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<CopyOutlined />}
+                  onClick={() => handleCopy(record)}
                 />
               </Tooltip>
             )}
@@ -324,6 +316,7 @@ export const InstanceTable: React.FC<InstanceTableProps> = React.memo(({
           onDelete={handleDelete}
           onViewHistory={handleViewHistory}
           onViewDetails={handleViewDetails}
+          onCopy={handleCopy}
           emptyText="No instances found"
         />
       }
@@ -344,7 +337,7 @@ export const InstanceTable: React.FC<InstanceTableProps> = React.memo(({
         rowClassName={(record) => {
           // Add visual indicators for different states
           if (record.ephemeral) return 'ephemeral-instance';
-          if (record.status === Status.ERROR) return 'error-instance';
+          if (record.status === Status.INACTIVE) return 'inactive-instance';
           return '';
         }}
       />

@@ -17,7 +17,7 @@ export interface StatusConfig {
 }
 
 /**
- * Instance status configurations
+ * Instance status configurations - simplified to only active and inactive
  */
 export const INSTANCE_STATUS_CONFIG: Record<string, StatusConfig> = {
   [Status.ACTIVE]: {
@@ -33,22 +33,7 @@ export const INSTANCE_STATUS_CONFIG: Record<string, StatusConfig> = {
     bgColor: '#fafafa',
     icon: 'pause-circle',
     description: '实例已停止'
-  },
-  [Status.PENDING]: {
-    label: '等待中',
-    color: '#faad14',
-    bgColor: '#fffbe6',
-    icon: 'clock-circle',
-    description: '实例正在启动'
-  },
-  [Status.ERROR]: {
-    label: '错误',
-    color: '#f5222d',
-    bgColor: '#fff2f0',
-    icon: 'exclamation-circle',
-    description: '实例运行出错'
-  },
-
+  }
 };
 
 /**
@@ -275,17 +260,10 @@ export const isActiveStatus = (status: string): boolean => {
 };
 
 /**
- * Check if status is error/negative
+ * Check if status is inactive/negative
  */
-export const isErrorStatus = (status: string): boolean => {
-  return status === Status.ERROR;
-};
-
-/**
- * Check if status is pending/transitional
- */
-export const isPendingStatus = (status: string): boolean => {
-  return status === Status.PENDING;
+export const isInactiveStatus = (status: string): boolean => {
+  return status === Status.INACTIVE;
 };
 
 /**
@@ -372,14 +350,8 @@ export const getStatusBadgeProps = (
       case Status.ACTIVE:
         antdStatus = 'success';
         break;
-      case Status.PENDING:
-        antdStatus = 'processing';
-        break;
-      case Status.ERROR:
-        antdStatus = 'error';
-        break;
       case Status.INACTIVE:
-        antdStatus = 'warning';
+        antdStatus = 'default';
         break;
       default:
         antdStatus = 'default';

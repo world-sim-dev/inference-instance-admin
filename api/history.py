@@ -17,6 +17,7 @@ from schemas import (
 )
 from services.history_service import HistoryService
 from services.exceptions import HistoryNotFoundError
+from auth import authenticate
 
 router = APIRouter(prefix="/api", tags=["history"])
 
@@ -29,7 +30,8 @@ async def get_instance_history(
     operation_type: Optional[str] = Query(None, description="Filter by operation type"),
     start_date: Optional[datetime] = Query(None, description="Filter records after this date"),
     end_date: Optional[datetime] = Query(None, description="Filter records before this date"),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: str = Depends(authenticate)
 ):
     """
     Get history records for a specific instance.
@@ -93,7 +95,8 @@ async def get_instance_history(
 @router.get("/history/{history_id}", response_model=InferenceInstanceHistoryResponse)
 async def get_history_record(
     history_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: str = Depends(authenticate)
 ):
     """
     Get a specific history record by ID.
@@ -131,7 +134,8 @@ async def list_all_history(
     start_date: Optional[datetime] = Query(None, description="Filter records after this date"),
     end_date: Optional[datetime] = Query(None, description="Filter records before this date"),
     original_id: Optional[int] = Query(None, description="Filter by original instance ID"),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: str = Depends(authenticate)
 ):
     """
     Get all history records with optional filtering.
@@ -196,7 +200,8 @@ async def list_all_history(
 async def get_latest_history(
     instance_id: int,
     operation_type: Optional[str] = Query(None, description="Filter by operation type"),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: str = Depends(authenticate)
 ):
     """
     Get the most recent history record for an instance.
@@ -240,7 +245,8 @@ async def get_instance_history_count(
     operation_type: Optional[str] = Query(None, description="Filter by operation type"),
     start_date: Optional[datetime] = Query(None, description="Filter records after this date"),
     end_date: Optional[datetime] = Query(None, description="Filter records before this date"),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: str = Depends(authenticate)
 ):
     """
     Get the count of history records for an instance.

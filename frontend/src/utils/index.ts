@@ -382,6 +382,7 @@ export * from './statusUtils';
 export * from './errorUtils';
 export * from './retryUtils';
 export * from './requestOptimization';
+export * from './securityUtils';
 
 // Selective exports to avoid conflicts
 export {

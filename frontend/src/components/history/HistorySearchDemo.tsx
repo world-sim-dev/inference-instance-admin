@@ -38,7 +38,7 @@ const generateMockHistoryRecords = (): HistoryRecord[] => {
   const models = ['gpt-4', 'gpt-3.5-turbo', 'llama-2', 'claude-3', 'gemini-pro'];
   const clusters = ['production-cluster', 'staging-cluster', 'development-cluster'];
   const operations = [OperationType.CREATE, OperationType.UPDATE, OperationType.DELETE];
-  const statuses = ['active', 'inactive', 'pending', 'error'];
+  const statuses = ['active', 'inactive'];
 
   for (let i = 1; i <= 50; i++) {
     const model = models[Math.floor(Math.random() * models.length)];

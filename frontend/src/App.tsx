@@ -3,8 +3,9 @@ import { useEffect } from 'react';
 import { ConfigProvider, theme } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { AppProvider } from './contexts';
+import { AppProvider, AuthProvider } from './contexts';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { AuthGuard } from './components/common/AuthGuard';
 import { WorkingDashboard } from './pages/WorkingDashboard';
 import './App.css';
 
@@ -38,14 +39,18 @@ const App: FC = () => {
       }}
     >
       <QueryClientProvider client={queryClient}>
-        <AppProvider>
-          <ConfigProvider 
-            locale={zhCN}
-            theme={antdTheme}
-          >
-            <WorkingDashboard />
-          </ConfigProvider>
-        </AppProvider>
+        <AuthProvider>
+          <AppProvider>
+            <ConfigProvider 
+              locale={zhCN}
+              theme={antdTheme}
+            >
+              <AuthGuard>
+                <WorkingDashboard />
+              </AuthGuard>
+            </ConfigProvider>
+          </AppProvider>
+        </AuthProvider>
       </QueryClientProvider>
     </ErrorBoundary>
   );

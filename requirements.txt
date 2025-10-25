@@ -17,3 +17,5 @@ psycopg2-binary>=2.9.7
 # asyncpg>=0.29.0
 # HTTP requests for testing
 requests>=2.31.0
+# Password hashing
+bcrypt>=4.0.0

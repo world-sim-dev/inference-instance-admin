@@ -6,7 +6,7 @@ Provides core CRUD operations with web interface and API endpoints.
 import logging
 import os
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException, Depends
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
@@ -19,6 +19,8 @@ load_dotenv()
 from database import init_db
 from api.instances import router as instances_router
 from api.history import router as history_router
+from api.auth import router as auth_router
+from middleware import SecurityMiddleware
 
 # Configure logging
 logging.basicConfig(
@@ -31,6 +33,8 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger(__name__)
+
+from auth import authenticate
 
 
 @asynccontextmanager
@@ -86,6 +90,9 @@ app = FastAPI(
 )
 
 
+# Add security middleware first (order matters)
+app.add_middleware(SecurityMiddleware)
+
 # Configure CORS
 # Get allowed origins from environment or use defaults
 allowed_origins = os.getenv("CORS_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000,http://localhost:5173,http://127.0.0.1:5173").split(",")
@@ -110,6 +117,7 @@ if os.path.exists("frontend/dist"):
 templates = Jinja2Templates(directory="templates")
 
 # Include API routers - these must be registered before the catch-all SPA handler
+app.include_router(auth_router)
 app.include_router(instances_router)
 app.include_router(history_router)
 

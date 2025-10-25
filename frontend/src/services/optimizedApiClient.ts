@@ -84,7 +84,11 @@ export class OptimizedApiClient extends ApiClient {
   private batchTimers = new Map<string, NodeJS.Timeout>();
   private debouncedFunctions = new Map<string, DebouncedFunction<any>>();
   
-  private config: Required<OptimizedApiClientConfig>;
+  private config: OptimizedApiClientConfig & {
+    requestDeduplication: Required<NonNullable<OptimizedApiClientConfig['requestDeduplication']>>;
+    batchRequests: Required<NonNullable<OptimizedApiClientConfig['batchRequests']>>;
+    debounce: Required<NonNullable<OptimizedApiClientConfig['debounce']>>;
+  };
 
   constructor(config: OptimizedApiClientConfig = {}) {
     super(config);
@@ -559,14 +563,20 @@ export class OptimizedApiClient extends ApiClient {
 
 /**
  * Create optimized API client instance
+ * Note: Authentication credentials should be set after user login, not hardcoded
  */
 export const createOptimizedApiClient = (config?: OptimizedApiClientConfig): OptimizedApiClient => {
-  return new OptimizedApiClient(config);
+  const client = new OptimizedApiClient(config);
+  // Authentication credentials will be set by AuthProvider after user login
+  return client;
 };
 
 /**
  * Default optimized API client instance
+ * Note: Authentication credentials will be set by AuthProvider after user login
  */
 export const optimizedApiClient = new OptimizedApiClient();
+
+// Authentication credentials will be set dynamically by AuthProvider
 
 export default OptimizedApiClient;

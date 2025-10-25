@@ -15,7 +15,7 @@ import {
   Tooltip,
   Alert
 } from 'antd';
-import { InfoCircleOutlined, WarningOutlined } from '@ant-design/icons';
+import { InfoCircleOutlined } from '@ant-design/icons';
 import type { InstanceFormData } from '../../types/instance';
 import { DEFAULT_INSTANCE_VALUES } from '../../types/instance';
 import { Status, StoreType, PipelineMode, Priority } from '../../types/enums';
@@ -116,8 +116,7 @@ export const InstanceForm: React.FC<InstanceFormProps> = ({
     // Clean up ephemeral fields if not ephemeral
     if (!serialized.ephemeral) {
       serialized.ephemeral_min_period_seconds = null;
-      serialized.ephemeral_from = '';
-      serialized.ephemeral_to = '';
+      // Keep ephemeral_from and ephemeral_to values even when ephemeral is false
     }
 
     return serialized;
@@ -183,10 +182,9 @@ export const InstanceForm: React.FC<InstanceFormProps> = ({
   // Handle ephemeral field changes to show/hide related fields
   const handleEphemeralChange = (checked: boolean) => {
     if (!checked) {
+      // Only clear the minimum period, keep ephemeral_to and ephemeral_from values
       form.setFieldsValue({
-        ephemeral_min_period_seconds: null,
-        ephemeral_to: '',
-        ephemeral_from: ''
+        ephemeral_min_period_seconds: null
       });
     }
   };
@@ -224,8 +222,6 @@ export const InstanceForm: React.FC<InstanceFormProps> = ({
               <Select placeholder="选择状态">
                 <Option value={Status.ACTIVE}>活跃</Option>
                 <Option value={Status.INACTIVE}>非活跃</Option>
-                <Option value={Status.PENDING}>等待中</Option>
-                <Option value={Status.ERROR}>错误</Option>
               </Select>
             </Form.Item>
           </Col>
@@ -443,13 +439,7 @@ export const InstanceForm: React.FC<InstanceFormProps> = ({
 
       {/* Resource Configuration Section */}
       <Card title="资源配置" style={{ marginBottom: 16 }}>
-        <Alert
-          message="资源配置提示"
-          description="PP × CP × TP 的乘积不应超过可用GPU数量。建议根据实际硬件配置调整这些参数。"
-          type="info"
-          showIcon
-          style={{ marginBottom: 16 }}
-        />
+
 
         <Row gutter={16}>
           <Col xs={24} sm={12} md={8}>
@@ -511,30 +501,7 @@ export const InstanceForm: React.FC<InstanceFormProps> = ({
           </Col>
         </Row>
 
-        {/* Cross-field validation warning */}
-        <Form.Item noStyle shouldUpdate={(prevValues, currentValues) =>
-          prevValues.pp !== currentValues.pp ||
-          prevValues.cp !== currentValues.cp ||
-          prevValues.tp !== currentValues.tp
-        }>
-          {({ getFieldValue }) => {
-            const pp = getFieldValue('pp') || 1;
-            const cp = getFieldValue('cp') || 1;
-            const tp = getFieldValue('tp') || 1;
-            const totalGpus = pp * cp * tp;
 
-            return totalGpus > 8 ? (
-              <Alert
-                message="资源配置警告"
-                description={`当前配置需要 ${totalGpus} 个GPU (PP=${pp} × CP=${cp} × TP=${tp})，请确保有足够的硬件资源。`}
-                type="warning"
-                showIcon
-                icon={<WarningOutlined />}
-                style={{ marginBottom: 16 }}
-              />
-            ) : null;
-          }}
-        </Form.Item>
 
         <Row gutter={16}>
           <Col xs={24} sm={12}>
@@ -578,7 +545,7 @@ export const InstanceForm: React.FC<InstanceFormProps> = ({
               }
               rules={[
                 { required: true, message: '请输入副本数' },
-                { type: 'number', min: 1, max: 10, message: '副本数应在1-10之间' },
+                { type: 'number', min: 1, message: '副本数不能小于1' },
                 {
                   validator: (_, value) => {
                     const nWorkers = form.getFieldValue('n_workers') || 1;
@@ -743,7 +710,7 @@ export const InstanceForm: React.FC<InstanceFormProps> = ({
               <>
                 <Alert
                   message="临时实例配置"
-                  description="临时实例将在指定的时间窗口内运行。请确保开始时间早于结束时间，并设置合适的最小运行周期。"
+                  description="配置临时实例的相关参数，包括最小运行周期和相关标识。"
                   type="info"
                   showIcon
                   style={{ marginBottom: 16 }}
@@ -761,7 +728,6 @@ export const InstanceForm: React.FC<InstanceFormProps> = ({
                         </span>
                       }
                       rules={[
-                        { required: true, message: '临时实例必须设置最小周期' },
                         { type: 'number', min: 60, max: 86400, message: '最小周期应在60-86400秒之间（1分钟到24小时）' }
                       ]}
                     >
@@ -776,49 +742,23 @@ export const InstanceForm: React.FC<InstanceFormProps> = ({
                   <Col xs={24} sm={8}>
                     <Form.Item
                       name="ephemeral_from"
-                      label="开始时间"
+                      label="ephemeral来源"
                       rules={[
-                        { required: true, message: '请输入开始时间' },
-                        { pattern: /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/, message: '请输入有效的时间格式 (HH:MM)' }
+                        { required: false, message: '请输入ephemeral来源' }
                       ]}
                     >
-                      <Input placeholder="HH:MM" />
+                      <Input placeholder="请输入ephemeral来源标识" />
                     </Form.Item>
                   </Col>
                   <Col xs={24} sm={8}>
                     <Form.Item
                       name="ephemeral_to"
-                      label="结束时间"
+                      label="ephemeral目标"
                       rules={[
-                        { required: true, message: '请输入结束时间' },
-                        { pattern: /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/, message: '请输入有效的时间格式 (HH:MM)' },
-                        {
-                          validator: (_, value) => {
-                            const fromTime = form.getFieldValue('ephemeral_from');
-                            if (value && fromTime) {
-                              const [fromHour, fromMin] = fromTime.split(':').map(Number);
-                              const [toHour, toMin] = value.split(':').map(Number);
-                              const fromMinutes = fromHour * 60 + fromMin;
-                              const toMinutes = toHour * 60 + toMin;
-
-                              if (toMinutes <= fromMinutes) {
-                                return Promise.reject(new Error('结束时间必须晚于开始时间'));
-                              }
-
-                              const durationMinutes = toMinutes - fromMinutes;
-                              const minPeriodSeconds = form.getFieldValue('ephemeral_min_period_seconds') || 300;
-                              const minPeriodMinutes = minPeriodSeconds / 60;
-
-                              if (durationMinutes < minPeriodMinutes) {
-                                return Promise.reject(new Error(`时间窗口至少需要 ${Math.ceil(minPeriodMinutes)} 分钟`));
-                              }
-                            }
-                            return Promise.resolve();
-                          }
-                        }
+                        { required: false, message: '请输入ephemeral目标' }
                       ]}
                     >
-                      <Input placeholder="HH:MM" />
+                      <Input placeholder="请输入ephemeral目标标识" />
                     </Form.Item>
                   </Col>
                 </Row>

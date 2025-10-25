@@ -14,7 +14,8 @@ import {
   PauseCircleOutlined,
   ClusterOutlined,
   DatabaseOutlined,
-  SettingOutlined
+  SettingOutlined,
+  CopyOutlined
 } from '@ant-design/icons';
 import type { Instance } from '../../types/instance';
 import { Status } from '../../types/enums';
@@ -31,6 +32,7 @@ export interface InstanceCardProps {
   onDelete?: (instance: Instance) => void;
   onViewHistory?: (instance: Instance) => void;
   onViewDetails?: (instance: Instance) => void;
+  onCopy?: (instance: Instance) => void;
 }
 
 /**
@@ -42,10 +44,6 @@ const getStatusColor = (status: string): string => {
       return 'green';
     case Status.INACTIVE:
       return 'default';
-    case Status.PENDING:
-      return 'orange';
-    case Status.ERROR:
-      return 'red';
     default:
       return 'default';
   }
@@ -59,10 +57,6 @@ const getStatusIcon = (status: string) => {
     case Status.ACTIVE:
       return <PlayCircleOutlined />;
     case Status.INACTIVE:
-      return <PauseCircleOutlined />;
-    case Status.PENDING:
-      return <PlayCircleOutlined spin />;
-    case Status.ERROR:
       return <PauseCircleOutlined />;
     default:
       return null;
@@ -86,6 +80,7 @@ export const InstanceCard: React.FC<InstanceCardProps> = React.memo(({
   onDelete,
   onViewHistory,
   onViewDetails,
+  onCopy,
 }) => {
   // Memoize action handlers to prevent unnecessary re-renders
   const handleEdit = useCallback(() => {
@@ -103,11 +98,15 @@ export const InstanceCard: React.FC<InstanceCardProps> = React.memo(({
   const handleViewDetails = useCallback(() => {
     onViewDetails?.(instance);
   }, [onViewDetails, instance]);
+
+  const handleCopy = useCallback(() => {
+    onCopy?.(instance);
+  }, [onCopy, instance]);
   // Memoize card className to prevent unnecessary recalculations
   const cardClassName = useMemo(() => `instance-card ${
     instance.ephemeral ? 'ephemeral-card' : ''
   } ${
-    instance.status === Status.ERROR ? 'error-card' : ''
+    instance.status === Status.INACTIVE ? 'inactive-card' : ''
   }`, [instance.ephemeral, instance.status]);
 
   // Memoize formatted priorities to prevent unnecessary recalculations
@@ -139,6 +138,17 @@ export const InstanceCard: React.FC<InstanceCardProps> = React.memo(({
               type="text"
               icon={<EditOutlined />}
               onClick={handleEdit}
+              className="card-action-btn"
+              size="large"
+            />
+          </Tooltip>
+        ),
+        onCopy && (
+          <Tooltip title="复制实例" key="copy">
+            <Button
+              type="text"
+              icon={<CopyOutlined />}
+              onClick={handleCopy}
               className="card-action-btn"
               size="large"
             />
@@ -215,22 +225,15 @@ export const InstanceCard: React.FC<InstanceCardProps> = React.memo(({
         </Col>
       </Row>
 
-      {/* Resources */}
+      {/* Workers */}
       <Row gutter={[8, 8]} className="card-info-row">
         <Col span={24}>
           <Space>
             <SettingOutlined className="card-icon" />
-            <div className="resource-info">
-              <Space size="small" wrap>
-                <Text className="resource-item">PP: {instance.pp}</Text>
-                <Text className="resource-item">CP: {instance.cp}</Text>
-                <Text className="resource-item">TP: {instance.tp}</Text>
-              </Space>
-              <div style={{ marginTop: 4 }}>
-                <Text type="secondary" style={{ fontSize: '12px' }}>
-                  {instance.n_workers} workers × {instance.replicas} replicas
-                </Text>
-              </div>
+            <div className="worker-info">
+              <Text type="secondary" style={{ fontSize: '12px' }}>
+                {instance.n_workers} workers × {instance.replicas} replicas
+              </Text>
             </div>
           </Space>
         </Col>

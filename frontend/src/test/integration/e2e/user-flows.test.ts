@@ -480,7 +480,7 @@ test.describe('Complete User Workflows', () => {
       { id: 1, ...mockInstance, name: 'prod-web-1', cluster_name: 'prod-cluster', status: 'active', created_at: '2024-01-01T00:00:00Z' },
       { id: 2, ...mockInstance, name: 'test-api-2', cluster_name: 'test-cluster', status: 'inactive', created_at: '2024-01-02T00:00:00Z' },
       { id: 3, ...mockInstance, name: 'dev-worker-3', cluster_name: 'dev-cluster', status: 'active', created_at: '2024-01-03T00:00:00Z' },
-      { id: 4, ...mockInstance, name: 'prod-db-4', cluster_name: 'prod-cluster', status: 'error', created_at: '2024-01-04T00:00:00Z' },
+      { id: 4, ...mockInstance, name: 'prod-db-4', cluster_name: 'prod-cluster', status: 'inactive', created_at: '2024-01-04T00:00:00Z' },
     ];
 
     await page.route(`${API_BASE_URL}/api/instances`, async (route) => {

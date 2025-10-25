@@ -25,6 +25,15 @@ import type {
 } from '../types/api';
 
 /**
+ * Authentication configuration from environment variables
+ */
+const AUTH_CONFIG = {
+  timeout: parseInt(import.meta.env.VITE_AUTH_TIMEOUT || '30000'),
+  retryAttempts: parseInt(import.meta.env.VITE_AUTH_RETRY_ATTEMPTS || '3'),
+  storageType: import.meta.env.VITE_AUTH_STORAGE_TYPE || 'sessionStorage'
+};
+
+/**
  * Default configuration for API client
  */
 const DEFAULT_CONFIG: ApiClientConfig = {
@@ -42,6 +51,8 @@ export class ApiClient implements ApiClientInterface {
   private client: AxiosInstance;
   public baseURL: string;
   public timeout: number;
+  private authFailureCallback?: () => void;
+  private isRetrying: boolean = false;
 
   constructor(config: ApiClientConfig = {}) {
     const finalConfig = { ...DEFAULT_CONFIG, ...config };
@@ -58,6 +69,7 @@ export class ApiClient implements ApiClientInterface {
 
     // Setup interceptors
     this.setupInterceptors();
+    this.setupAuthInterceptor();
 
     // Apply custom interceptors if provided
     if (finalConfig.requestInterceptors) {
@@ -106,6 +118,69 @@ export class ApiClient implements ApiClientInterface {
       (error) => {
         console.error('[API] Response error:', error);
         return Promise.reject(this.handleError(error));
+      }
+    );
+  }
+
+  /**
+   * Setup authentication interceptor for handling 401 responses and retry logic
+   */
+  private setupAuthInterceptor(): void {
+    this.client.interceptors.request.use(
+      (config) => {
+        // Ensure authentication headers are present if credentials are stored
+        if (!config.headers['Authorization'] && this.isAuthenticated()) {
+          const storage = this.getStorage();
+          const credentials = storage.getItem('auth_credentials');
+          if (credentials) {
+            config.headers['Authorization'] = `Basic ${credentials}`;
+          }
+        }
+        return config;
+      },
+      (error) => Promise.reject(error)
+    );
+
+    this.client.interceptors.response.use(
+      (response) => response,
+      async (error) => {
+        const originalRequest = error.config;
+
+        // Handle 401 Unauthorized responses
+        if (error.response?.status === 401 && !originalRequest._retry && !this.isRetrying) {
+          originalRequest._retry = true;
+          this.isRetrying = true;
+
+          try {
+            // Clear invalid credentials
+            this.clearAuthCredentials();
+            
+            // Trigger authentication failure callback if set
+            if (this.authFailureCallback) {
+              this.authFailureCallback();
+            }
+
+            // Wait for potential re-authentication
+            await new Promise(resolve => setTimeout(resolve, 100));
+
+            // Check if credentials were restored
+            if (this.isAuthenticated()) {
+              const storage = this.getStorage();
+              const credentials = storage.getItem('auth_credentials');
+              if (credentials) {
+                originalRequest.headers['Authorization'] = `Basic ${credentials}`;
+                this.isRetrying = false;
+                return this.client(originalRequest);
+              }
+            }
+          } catch (retryError) {
+            console.error('[API] Retry failed:', retryError);
+          } finally {
+            this.isRetrying = false;
+          }
+        }
+
+        return Promise.reject(error);
       }
     );
   }
@@ -271,10 +346,18 @@ export class ApiClient implements ApiClientInterface {
   }
 
   /**
-   * Set authentication token
+   * Set authentication token (Bearer token)
    */
   public setAuthToken(token: string): void {
     this.client.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  }
+
+  /**
+   * Set Basic Authentication credentials
+   */
+  public setBasicAuth(username: string, password: string): void {
+    const credentials = btoa(`${username}:${password}`);
+    this.client.defaults.headers.common['Authorization'] = `Basic ${credentials}`;
   }
 
   /**
@@ -282,6 +365,117 @@ export class ApiClient implements ApiClientInterface {
    */
   public clearAuthToken(): void {
     delete this.client.defaults.headers.common['Authorization'];
+  }
+
+  /**
+   * Verify credentials with backend using dedicated auth endpoint with retry logic
+   */
+  public async verifyCredentials(username: string, password: string): Promise<boolean> {
+    const maxRetries = AUTH_CONFIG.retryAttempts;
+    let lastError: any;
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        // Create a temporary client for credential verification
+        const tempClient = axios.create({
+          baseURL: this.baseURL,
+          timeout: AUTH_CONFIG.timeout,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Basic ${btoa(`${username}:${password}`)}`
+          }
+        });
+
+        // Use dedicated auth verification endpoint
+        const response = await tempClient.post('/auth/verify');
+        return response.status === 200 && response.data?.authenticated === true;
+      } catch (error) {
+        lastError = error;
+        const axiosError = error as AxiosError;
+        
+        // Don't retry for authentication errors (401)
+        if (axiosError.response?.status === 401) {
+          return false;
+        }
+        
+        // Don't retry on the last attempt
+        if (attempt === maxRetries) {
+          break;
+        }
+        
+        // Wait before retrying (exponential backoff)
+        await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+      }
+    }
+
+    // For other errors after all retries, we'll assume credentials are invalid
+    console.error('[API] Authentication verification failed after retries:', lastError);
+    return false;
+  }
+
+  /**
+   * Get storage object based on configuration
+   */
+  private getStorage(): Storage {
+    return AUTH_CONFIG.storageType === 'localStorage' ? localStorage : sessionStorage;
+  }
+
+  /**
+   * Set authentication credentials for all requests
+   */
+  public setAuthCredentials(username: string, password: string): void {
+    this.setBasicAuth(username, password);
+    // Store credentials for session management using configured storage
+    const storage = this.getStorage();
+    storage.setItem('auth_credentials', btoa(`${username}:${password}`));
+    storage.setItem('auth_username', username);
+    storage.setItem('auth_timestamp', Date.now().toString());
+  }
+
+  /**
+   * Clear authentication credentials
+   */
+  public clearAuthCredentials(): void {
+    this.clearAuthToken();
+    // Clear stored credentials from configured storage
+    const storage = this.getStorage();
+    storage.removeItem('auth_credentials');
+    storage.removeItem('auth_username');
+    storage.removeItem('auth_timestamp');
+  }
+
+  /**
+   * Check if client is authenticated
+   */
+  public isAuthenticated(): boolean {
+    const hasAuthHeader = !!this.client.defaults.headers.common['Authorization'];
+    const storage = this.getStorage();
+    const hasStoredCredentials = !!storage.getItem('auth_credentials');
+    
+    // If we have stored credentials but no auth header, restore the header
+    if (hasStoredCredentials && !hasAuthHeader) {
+      const credentials = storage.getItem('auth_credentials');
+      if (credentials) {
+        this.client.defaults.headers.common['Authorization'] = `Basic ${credentials}`;
+        return true;
+      }
+    }
+    
+    return hasAuthHeader;
+  }
+
+  /**
+   * Set callback function to be called when authentication fails
+   */
+  public setAuthFailureCallback(callback: () => void): void {
+    this.authFailureCallback = callback;
+  }
+
+  /**
+   * Clear authentication failure callback
+   */
+  public clearAuthFailureCallback(): void {
+    this.authFailureCallback = undefined;
   }
 
   // Instance API Methods
@@ -379,6 +573,26 @@ export class ApiClient implements ApiClientInterface {
   public async deleteInstance(id: number): Promise<void> {
     try {
       await this.client.delete(`/instances/${id}`);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  /**
+   * Copy an existing instance
+   */
+  public async copyInstance(sourceInstanceId: number, newName?: string): Promise<Instance> {
+    try {
+      const payload: any = {
+        source_instance_id: sourceInstanceId
+      };
+      
+      if (newName) {
+        payload.new_name = newName;
+      }
+
+      const response: AxiosResponse<Instance> = await this.client.post('/instances/copy', payload);
+      return response.data;
     } catch (error) {
       throw error;
     }

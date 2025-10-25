@@ -13,7 +13,8 @@ import {
   HistoryOutlined, 
   EyeOutlined,
   PlayCircleOutlined,
-  PauseCircleOutlined 
+  PauseCircleOutlined,
+  CopyOutlined
 } from '@ant-design/icons';
 import type { Instance } from '../../types/instance';
 import { Status } from '../../types/enums';
@@ -33,6 +34,7 @@ export interface VirtualizedInstanceTableProps {
   onDelete?: (instance: Instance) => void;
   onViewHistory?: (instance: Instance) => void;
   onViewDetails?: (instance: Instance) => void;
+  onCopy?: (instance: Instance) => void;
 }
 
 /**
@@ -44,10 +46,6 @@ const getStatusColor = (status: string): string => {
       return 'green';
     case Status.INACTIVE:
       return 'default';
-    case Status.PENDING:
-      return 'orange';
-    case Status.ERROR:
-      return 'red';
     default:
       return 'default';
   }
@@ -61,10 +59,6 @@ const getStatusIcon = (status: string) => {
     case Status.ACTIVE:
       return <PlayCircleOutlined />;
     case Status.INACTIVE:
-      return <PauseCircleOutlined />;
-    case Status.PENDING:
-      return <PlayCircleOutlined spin />;
-    case Status.ERROR:
       return <PauseCircleOutlined />;
     default:
       return null;
@@ -83,12 +77,13 @@ interface RowProps {
     onDelete?: (instance: Instance) => void;
     onViewHistory?: (instance: Instance) => void;
     onViewDetails?: (instance: Instance) => void;
+    onCopy?: (instance: Instance) => void;
     isMobile: boolean;
   };
 }
 
 const Row: React.FC<RowProps> = React.memo(({ index, style, data }) => {
-  const { instances, onEdit, onDelete, onViewHistory, onViewDetails, isMobile } = data;
+  const { instances, onEdit, onDelete, onViewHistory, onViewDetails, onCopy, isMobile } = data;
   const instance = instances[index];
 
   const handleEdit = useCallback(() => {
@@ -106,6 +101,10 @@ const Row: React.FC<RowProps> = React.memo(({ index, style, data }) => {
   const handleViewDetails = useCallback(() => {
     onViewDetails?.(instance);
   }, [onViewDetails, instance]);
+
+  const handleCopy = useCallback(() => {
+    onCopy?.(instance);
+  }, [onCopy, instance]);
 
   return (
     <div style={style}>
@@ -151,9 +150,6 @@ const Row: React.FC<RowProps> = React.memo(({ index, style, data }) => {
                   <Text type="secondary" style={{ fontSize: '12px' }}>
                     {instance.cluster_name}
                   </Text>
-                  <Text type="secondary" style={{ fontSize: '12px' }}>
-                    PP:{instance.pp} CP:{instance.cp} TP:{instance.tp}
-                  </Text>
                 </>
               )}
             </Space>
@@ -179,6 +175,16 @@ const Row: React.FC<RowProps> = React.memo(({ index, style, data }) => {
                     size="small"
                     icon={<EditOutlined />}
                     onClick={handleEdit}
+                  />
+                </Tooltip>
+              )}
+              {onCopy && (
+                <Tooltip title="Copy Instance">
+                  <Button
+                    type="text"
+                    size="small"
+                    icon={<CopyOutlined />}
+                    onClick={handleCopy}
                   />
                 </Tooltip>
               )}
@@ -225,6 +231,7 @@ export const VirtualizedInstanceTable: React.FC<VirtualizedInstanceTableProps> =
   onDelete,
   onViewHistory,
   onViewDetails,
+  onCopy,
 }) => {
   const { isMobile } = useResponsive();
   const listRef = useRef<any>(null);
@@ -236,8 +243,9 @@ export const VirtualizedInstanceTable: React.FC<VirtualizedInstanceTableProps> =
     onDelete,
     onViewHistory,
     onViewDetails,
+    onCopy,
     isMobile,
-  }), [instances, onEdit, onDelete, onViewHistory, onViewDetails, isMobile]);
+  }), [instances, onEdit, onDelete, onViewHistory, onViewDetails, onCopy, isMobile]);
 
   // Scroll to top when instances change
   const scrollToTop = useCallback(() => {

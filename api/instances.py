@@ -5,6 +5,7 @@ Provides CRUD operations for InferenceInstance entities.
 
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi.security import HTTPBasicCredentials
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
@@ -13,13 +14,16 @@ from schemas import (
     InferenceInstanceCreate,
     InferenceInstanceUpdate,
     InferenceInstanceResponse,
+    InferenceInstanceCopyRequest,
     ErrorResponse
 )
 from services.instance_service import InstanceService
+from auth import authenticate
 from services.exceptions import (
     InstanceNotFoundError,
     InstanceValidationError,
-    InstanceError
+    InstanceError,
+    InstanceConflictError
 )
 
 router = APIRouter(prefix="/api/instances", tags=["instances"])
@@ -34,7 +38,8 @@ async def list_instances(
     cluster_name: Optional[str] = Query(None, description="Filter by cluster name"),
     status: Optional[str] = Query(None, description="Filter by status"),
     priority: Optional[str] = Query(None, description="Filter by priority"),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: str = Depends(authenticate)
 ):
     """
     List instances with optional filtering and pagination.
@@ -72,7 +77,8 @@ async def list_instances(
 @router.post("/", response_model=InferenceInstanceResponse, status_code=201)
 async def create_instance(
     instance_data: InferenceInstanceCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: str = Depends(authenticate)
 ):
     """
     Create a new inference instance.
@@ -112,7 +118,8 @@ async def create_instance(
 @router.get("/{instance_id}", response_model=InferenceInstanceResponse)
 async def get_instance(
     instance_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: str = Depends(authenticate)
 ):
     """
     Get a specific instance by ID.
@@ -187,7 +194,8 @@ async def get_instance(
 async def update_instance(
     instance_id: int,
     instance_data: InferenceInstanceUpdate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: str = Depends(authenticate)
 ):
     """
     Update an existing instance.
@@ -243,7 +251,8 @@ async def update_instance(
 @router.delete("/{instance_id}", status_code=204)
 async def delete_instance(
     instance_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: str = Depends(authenticate)
 ):
     """
     Delete an instance.
@@ -273,10 +282,57 @@ async def delete_instance(
         )
 
 
+@router.post("/copy", response_model=InferenceInstanceResponse, status_code=201)
+async def copy_instance(
+    copy_request: InferenceInstanceCopyRequest,
+    db: Session = Depends(get_db),
+    current_user: str = Depends(authenticate)
+):
+    """
+    Copy an existing instance with a new name.
+    
+    Creates a copy of the specified instance with all the same configuration
+    but with a new name. If no name is provided, one will be auto-generated.
+    """
+    try:
+        instance = InstanceService.copy_instance(
+            db, 
+            copy_request.source_instance_id, 
+            copy_request.new_name
+        )
+        return instance
+        
+    except InstanceNotFoundError:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Source instance with id {copy_request.source_instance_id} not found"
+        )
+        
+    except InstanceConflictError as e:
+        raise HTTPException(
+            status_code=409,
+            detail=str(e)
+        )
+        
+    except InstanceValidationError as e:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Validation error: {str(e)}"
+        )
+        
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to copy instance: {str(e)}"
+        )
+
+
 @router.get("/name/{instance_name}", response_model=InferenceInstanceResponse)
 async def get_instance_by_name(
     instance_name: str,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: str = Depends(authenticate)
 ):
     """
     Get a specific instance by name.

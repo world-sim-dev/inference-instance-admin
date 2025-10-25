@@ -326,10 +326,10 @@ export const ViewDetailsModal: React.FC<ViewDetailsModalProps> = React.memo(({
               <Descriptions.Item label="最小运行时间" span={1}>
                 <Text>{instance.ephemeral_min_period_seconds ? `${instance.ephemeral_min_period_seconds} 秒` : '未设置'}</Text>
               </Descriptions.Item>
-              <Descriptions.Item label="生效时间" span={1}>
+              <Descriptions.Item label="ephemeral来源" span={1}>
                 <Text>{instance.ephemeral_from || '未设置'}</Text>
               </Descriptions.Item>
-              <Descriptions.Item label="失效时间" span={1}>
+              <Descriptions.Item label="ephemeral目标" span={1}>
                 <Text>{instance.ephemeral_to || '未设置'}</Text>
               </Descriptions.Item>
             </Descriptions>

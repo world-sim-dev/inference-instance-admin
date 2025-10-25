@@ -111,7 +111,7 @@ export const InstanceFilters: React.FC<InstanceFiltersProps> = ({
    * Available status options
    */
   const statusOptions = useMemo(() => {
-    const defaultStatuses = [Status.ACTIVE, Status.INACTIVE, Status.PENDING, Status.ERROR];
+    const defaultStatuses = [Status.ACTIVE, Status.INACTIVE];
     const availableStatuses = filterOptions.statuses.length > 0 
       ? filterOptions.statuses 
       : defaultStatuses;

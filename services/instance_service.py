@@ -515,6 +515,121 @@ class InstanceService:
         return HistoryService.get_history(session, instance_id, filters, limit, offset)
 
     @staticmethod
+    def copy_instance(session: Session, source_instance_id: int, new_name: Optional[str] = None) -> InferenceInstance:
+        """
+        Copy an existing InferenceInstance with a new name.
+        
+        Args:
+            session: Database session
+            source_instance_id: ID of the instance to copy
+            new_name: Optional new name for the copied instance
+            
+        Returns:
+            InferenceInstance: Newly created copy of the instance
+            
+        Raises:
+            InstanceNotFoundError: If source instance not found
+            InstanceConflictError: If generated name conflicts
+            InstanceError: If copy operation fails
+        """
+        try:
+            # Get the source instance
+            source_instance = InstanceService.get_by_id(session, source_instance_id)
+            if not source_instance:
+                raise InstanceNotFoundError(f"Source instance with ID {source_instance_id} not found", instance_id=source_instance_id)
+            
+            # Generate new name if not provided
+            if not new_name:
+                new_name = InstanceService._generate_copy_name(session, source_instance.name)
+            else:
+                # Check if provided name already exists
+                existing = InstanceService.get_by_name(session, new_name)
+                if existing:
+                    raise InstanceConflictError(f"Instance with name '{new_name}' already exists", conflicting_field="name")
+            
+            # Create copy data from source instance
+            copy_data = {
+                'name': new_name,
+                'model_name': source_instance.model_name,
+                'model_version': source_instance.model_version,
+                'cluster_name': source_instance.cluster_name,
+                'image_tag': source_instance.image_tag,
+                'pipeline_mode': source_instance.pipeline_mode,
+                'quant_mode': source_instance.quant_mode,
+                'distill_mode': source_instance.distill_mode,
+                'm405_mode': source_instance.m405_mode,
+                'fps': source_instance.fps,
+                'checkpoint_path': source_instance.checkpoint_path,
+                'nonce': source_instance.nonce,
+                'pp': source_instance.pp,
+                'cp': source_instance.cp,
+                'tp': source_instance.tp,
+                'n_workers': source_instance.n_workers,
+                'replicas': source_instance.replicas,
+                'envs': source_instance.envs,
+                'description': source_instance.desc,
+                'separate_video_encode': source_instance.separate_video_encode,
+                'separate_video_decode': source_instance.separate_video_decode,
+                'separate_t5_encode': source_instance.separate_t5_encode,
+                'ephemeral': source_instance.ephemeral,
+                'ephemeral_min_period_seconds': source_instance.ephemeral_min_period_seconds,
+                'ephemeral_to': source_instance.ephemeral_to,
+                'ephemeral_from': source_instance.ephemeral_from,
+                'vae_store_type': source_instance.vae_store_type,
+                't5_store_type': source_instance.t5_store_type,
+                'enable_cuda_graph': source_instance.enable_cuda_graph,
+                'task_concurrency': source_instance.task_concurrency,
+                'celery_task_concurrency': source_instance.celery_task_concurrency,
+                'status': source_instance.status
+            }
+            
+            # Create the new instance
+            new_instance = InstanceService.create(session, copy_data)
+            
+            logger.info(f"Copied instance {source_instance.name} (ID: {source_instance_id}) to {new_name} (ID: {new_instance.id})")
+            return new_instance
+            
+        except Exception as e:
+            session.rollback()
+            logger.error(f"Error copying instance {source_instance_id}: {str(e)}")
+            if not isinstance(e, InstanceError):
+                raise InstanceOperationError("Failed to copy instance", operation="copy", cause=str(e))
+            raise
+
+    @staticmethod
+    def _generate_copy_name(session: Session, base_name: str) -> str:
+        """
+        Generate a unique name for a copied instance.
+        
+        Args:
+            session: Database session
+            base_name: Base name to generate copy name from
+            
+        Returns:
+            str: Unique copy name
+        """
+        # Try simple "copy" suffix first
+        copy_name = f"{base_name}copy"
+        
+        # Check if this name exists
+        existing = InstanceService.get_by_name(session, copy_name)
+        if not existing:
+            return copy_name
+        
+        # If it exists, try numbered suffixes
+        counter = 1
+        while True:
+            copy_name = f"{base_name}copy{counter}"
+            existing = InstanceService.get_by_name(session, copy_name)
+            if not existing:
+                return copy_name
+            counter += 1
+            
+            # Safety check to prevent infinite loop
+            if counter > 1000:
+                raise InstanceOperationError("Unable to generate unique copy name after 1000 attempts")
+
+    @staticmethod
     def get_instance_with_latest_history(session: Session, instance_id: int):
         """
         Get an instance along with its most recent history record.

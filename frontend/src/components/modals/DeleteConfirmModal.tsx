@@ -178,8 +178,7 @@ const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
                 <Text 
                   style={{ 
                     color: instance.status === 'active' ? '#52c41a' : 
-                           instance.status === 'inactive' ? '#faad14' : 
-                           instance.status === 'error' ? '#ff4d4f' : '#1890ff'
+                           instance.status === 'inactive' ? '#faad14' : '#1890ff'
                   }}
                 >
                   {instance.status}

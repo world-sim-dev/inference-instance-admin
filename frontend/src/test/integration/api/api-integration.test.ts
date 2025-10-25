@@ -682,7 +682,7 @@ describe('API Integration Tests', () => {
     it('should handle complex filtering queries', async () => {
       const complexQuery = {
         filters: {
-          status: ['active', 'pending'],
+          status: ['active', 'inactive'],
           cluster_name: ['prod-cluster'],
           created_after: '2024-01-01T00:00:00Z',
           has_description: true,

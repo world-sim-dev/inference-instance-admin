@@ -645,13 +645,13 @@ export const HistoryDetail: React.FC<HistoryDetailProps> = ({
             render: (value: any) => value ? `${value} 秒` : null
           },
           {
-            label: '生效时间',
+            label: 'ephemeral来源',
             value: record.ephemeral_from,
             key: 'ephemeral_from',
             span: 1
           },
           {
-            label: '失效时间',
+            label: 'ephemeral目标',
             value: record.ephemeral_to,
             key: 'ephemeral_to',
             span: 1

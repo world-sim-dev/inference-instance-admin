@@ -43,3 +43,6 @@ export {
 } from './FeedbackSystem';
 
 export { ErrorBoundary, withErrorBoundary, useErrorBoundary } from './ErrorBoundary';
+
+// Authentication components
+export { AuthGuard } from './AuthGuard';

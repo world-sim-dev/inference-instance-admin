@@ -264,8 +264,8 @@ describe('InstanceForm', () => {
 
       await waitFor(() => {
         expect(screen.getByLabelText('最小周期（秒）')).toBeInTheDocument();
-        expect(screen.getByLabelText('开始时间')).toBeInTheDocument();
-        expect(screen.getByLabelText('结束时间')).toBeInTheDocument();
+        expect(screen.getByLabelText('ephemeral来源')).toBeInTheDocument();
+        expect(screen.getByLabelText('ephemeral目标')).toBeInTheDocument();
       });
     });
 
@@ -275,11 +275,11 @@ describe('InstanceForm', () => {
 
       // Ephemeral fields should not be visible initially
       expect(screen.queryByLabelText('最小周期（秒）')).not.toBeInTheDocument();
-      expect(screen.queryByLabelText('开始时间')).not.toBeInTheDocument();
-      expect(screen.queryByLabelText('结束时间')).not.toBeInTheDocument();
+      expect(screen.queryByLabelText('ephemeral来源')).not.toBeInTheDocument();
+      expect(screen.queryByLabelText('ephemeral目标')).not.toBeInTheDocument();
     });
 
-    it('should validate ephemeral time fields', async () => {
+    it('should show ephemeral configuration fields when enabled', async () => {
       const user = userEvent.setup();
       renderWithProviders(<InstanceForm {...defaultProps} />);
 
@@ -288,25 +288,13 @@ describe('InstanceForm', () => {
       await user.click(ephemeralSwitch);
 
       await waitFor(() => {
-        expect(screen.getByLabelText('开始时间')).toBeInTheDocument();
-      });
-
-      // Set invalid time format
-      const fromTimeInput = screen.getByLabelText('开始时间');
-      const toTimeInput = screen.getByLabelText('结束时间');
-
-      await user.type(fromTimeInput, '25:00');
-      await user.type(toTimeInput, '26:00');
-
-      const submitButton = screen.getByText('创建实例');
-      await user.click(submitButton);
-
-      await waitFor(() => {
-        expect(screen.getAllByText('请输入有效的时间格式 (HH:MM)')).toHaveLength(2);
+        expect(screen.getByLabelText('ephemeral来源')).toBeInTheDocument();
+        expect(screen.getByLabelText('ephemeral目标')).toBeInTheDocument();
+        expect(screen.getByLabelText('最小周期（秒）')).toBeInTheDocument();
       });
     });
 
-    it('should validate ephemeral time range', async () => {
+    it('should allow setting ephemeral source and target', async () => {
       const user = userEvent.setup();
       renderWithProviders(<InstanceForm {...defaultProps} />);
 
@@ -315,24 +303,18 @@ describe('InstanceForm', () => {
       await user.click(ephemeralSwitch);
 
       await waitFor(() => {
-        expect(screen.getByLabelText('开始时间')).toBeInTheDocument();
+        expect(screen.getByLabelText('ephemeral来源')).toBeInTheDocument();
       });
 
-      // Set end time before start time
-      const fromTimeInput = screen.getByLabelText('开始时间');
-      const toTimeInput = screen.getByLabelText('结束时间');
-      const minPeriodInput = screen.getByLabelText('最小周期（秒）');
+      // Set ephemeral source and target
+      const fromInput = screen.getByLabelText('ephemeral来源');
+      const toInput = screen.getByLabelText('ephemeral目标');
 
-      await user.type(minPeriodInput, '300');
-      await user.type(fromTimeInput, '10:00');
-      await user.type(toTimeInput, '09:00');
+      await user.type(fromInput, 'source-identifier');
+      await user.type(toInput, 'target-identifier');
 
-      const submitButton = screen.getByText('创建实例');
-      await user.click(submitButton);
-
-      await waitFor(() => {
-        expect(screen.getByText('结束时间必须晚于开始时间')).toBeInTheDocument();
-      });
+      expect(fromInput).toHaveValue('source-identifier');
+      expect(toInput).toHaveValue('target-identifier');
     });
   });
 

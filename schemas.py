@@ -31,7 +31,7 @@ class InferenceInstanceBase(BaseModel):
     cp: int = Field(default=8, ge=1, le=64, description="Context parallelism")
     tp: int = Field(default=1, ge=1, le=16, description="Tensor parallelism")
     n_workers: int = Field(default=1, ge=1, le=100, description="Number of workers")
-    replicas: int = Field(default=1, ge=1, le=100, description="Number of replicas")
+    replicas: int = Field(default=1, ge=1, description="Number of replicas")
     
     # Priority and environment
     priorities: List[str] = Field(default_factory=lambda: [Priority.HIGH.value, Priority.NORMAL.value, Priority.LOW.value, Priority.VERY_LOW.value], description="Priority list")
@@ -111,7 +111,7 @@ class InferenceInstanceUpdate(BaseModel):
     cp: Optional[int] = Field(None, ge=1, le=64)
     tp: Optional[int] = Field(None, ge=1, le=16)
     n_workers: Optional[int] = Field(None, ge=1, le=100)
-    replicas: Optional[int] = Field(None, ge=1, le=100)
+    replicas: Optional[int] = Field(None, ge=1)
     
     # Priority and environment
     priorities: Optional[List[str]] = None
@@ -414,6 +414,20 @@ class HistoryListResponse(BaseModel):
     limit: int = Field(..., ge=1, description="Number of records requested")
     offset: int = Field(..., ge=0, description="Number of records skipped")
     has_more: bool = Field(..., description="Whether more records are available")
+
+
+class InferenceInstanceCopyRequest(BaseModel):
+    """Schema for copying an instance"""
+    source_instance_id: int = Field(..., description="ID of the instance to copy")
+    new_name: Optional[str] = Field(None, description="New name for the copied instance (auto-generated if not provided)")
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "source_instance_id": 1,
+                "new_name": "my-instance-copy"
+            }
+        }
 
 
 class ErrorResponse(BaseModel):

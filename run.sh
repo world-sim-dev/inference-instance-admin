@@ -214,7 +214,7 @@ setup_frontend() {
 VITE_APP_TITLE=Inference Dashboard (Dev)
 VITE_API_BASE_URL=http://localhost:${BACKEND_PORT}
 VITE_ENABLE_MOCK_API=false
-VITE_LOG_LEVEL=debug
+ _LOG_LEVEL=debug
 VITE_ENABLE_DEVTOOLS=true
 EOF
     fi

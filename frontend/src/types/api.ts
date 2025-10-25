@@ -100,6 +100,7 @@ export interface ApiClientInterface extends InstanceApiMethods, HistoryApiMethod
   
   // Utility methods
   setAuthToken(token: string): void;
+  setBasicAuth(username: string, password: string): void;
   clearAuthToken(): void;
 }
 

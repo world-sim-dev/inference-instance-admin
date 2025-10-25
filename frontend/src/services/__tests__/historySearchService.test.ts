@@ -66,7 +66,7 @@ const mockHistoryRecords: HistoryRecord[] = [
     cluster_name: 'development-cluster',
     image_tag: 'v2.0.0',
     description: 'Development instance for testing',
-    status: 'pending',
+    status: 'inactive',
     ephemeral: true,
     quant_mode: false,
     distill_mode: false,
@@ -345,7 +345,7 @@ describe('HistorySearchService', () => {
       
       expect(options.modelNames).toEqual(['gpt-4', 'llama-2']);
       expect(options.clusterNames).toEqual(['development-cluster', 'production-cluster']);
-      expect(options.statuses).toEqual(['active', 'pending']);
+      expect(options.statuses).toEqual(['active', 'inactive']);
       expect(options.imageTags).toEqual(['v1.0.0', 'v1.1.0', 'v2.0.0']);
     });
 

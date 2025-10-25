@@ -275,7 +275,93 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
               <Descriptions.Item label="Context并行度">{selectedRecord.cp}</Descriptions.Item>
               <Descriptions.Item label="Tensor并行度">{selectedRecord.tp}</Descriptions.Item>
               <Descriptions.Item label="任务并发数">{selectedRecord.task_concurrency}</Descriptions.Item>
+              {selectedRecord.celery_task_concurrency && (
+                <Descriptions.Item label="Celery任务并发">{selectedRecord.celery_task_concurrency}</Descriptions.Item>
+              )}
+              {selectedRecord.fps && (
+                <Descriptions.Item label="FPS">{selectedRecord.fps}</Descriptions.Item>
+              )}
             </Descriptions>
+
+            <Descriptions title="模式配置" bordered column={2} size="small" style={{ marginTop: 16 }}>
+              <Descriptions.Item label="管道模式">{selectedRecord.pipeline_mode || 'default'}</Descriptions.Item>
+              <Descriptions.Item label="量化模式">
+                <Tag color={selectedRecord.quant_mode ? 'purple' : 'default'}>
+                  {selectedRecord.quant_mode ? '启用' : '禁用'}
+                </Tag>
+              </Descriptions.Item>
+              <Descriptions.Item label="蒸馏模式">
+                <Tag color={selectedRecord.distill_mode ? 'cyan' : 'default'}>
+                  {selectedRecord.distill_mode ? '启用' : '禁用'}
+                </Tag>
+              </Descriptions.Item>
+              <Descriptions.Item label="M405模式">
+                <Tag color={selectedRecord.m405_mode ? 'orange' : 'default'}>
+                  {selectedRecord.m405_mode ? '启用' : '禁用'}
+                </Tag>
+              </Descriptions.Item>
+              <Descriptions.Item label="CUDA图优化">
+                <Tag color={selectedRecord.enable_cuda_graph ? 'green' : 'default'}>
+                  {selectedRecord.enable_cuda_graph ? '启用' : '禁用'}
+                </Tag>
+              </Descriptions.Item>
+              <Descriptions.Item label="分离视频编码">
+                <Tag color={selectedRecord.separate_video_encode ? 'green' : 'default'}>
+                  {selectedRecord.separate_video_encode ? '启用' : '禁用'}
+                </Tag>
+              </Descriptions.Item>
+              <Descriptions.Item label="分离视频解码">
+                <Tag color={selectedRecord.separate_video_decode ? 'green' : 'default'}>
+                  {selectedRecord.separate_video_decode ? '启用' : '禁用'}
+                </Tag>
+              </Descriptions.Item>
+              <Descriptions.Item label="分离T5编码">
+                <Tag color={selectedRecord.separate_t5_encode ? 'green' : 'default'}>
+                  {selectedRecord.separate_t5_encode ? '启用' : '禁用'}
+                </Tag>
+              </Descriptions.Item>
+            </Descriptions>
+
+            <Descriptions title="临时实例配置" bordered column={2} size="small" style={{ marginTop: 16 }}>
+              <Descriptions.Item label="临时实例">
+                <Tag color={selectedRecord.ephemeral ? 'blue' : 'default'}>
+                  {selectedRecord.ephemeral ? '是' : '否'}
+                </Tag>
+              </Descriptions.Item>
+              <Descriptions.Item label="最小存活时间">
+                {selectedRecord.ephemeral_min_period_seconds ? 
+                  `${selectedRecord.ephemeral_min_period_seconds} 秒` : 
+                  '未设置'
+                }
+              </Descriptions.Item>
+              <Descriptions.Item label="ephemeral来源">
+                {selectedRecord.ephemeral_from || '未设置'}
+              </Descriptions.Item>
+              <Descriptions.Item label="ephemeral目标">
+                {selectedRecord.ephemeral_to || '未设置'}
+              </Descriptions.Item>
+            </Descriptions>
+
+            <Descriptions title="存储配置" bordered column={2} size="small" style={{ marginTop: 16 }}>
+              <Descriptions.Item label="VAE存储类型">
+                {selectedRecord.vae_store_type || 'redis'}
+              </Descriptions.Item>
+              <Descriptions.Item label="T5存储类型">
+                {selectedRecord.t5_store_type || 'redis'}
+              </Descriptions.Item>
+            </Descriptions>
+
+            {selectedRecord.checkpoint_path && (
+              <Descriptions title="路径配置" bordered column={1} size="small" style={{ marginTop: 16 }}>
+                <Descriptions.Item label="检查点路径">{selectedRecord.checkpoint_path}</Descriptions.Item>
+              </Descriptions>
+            )}
+
+            {selectedRecord.nonce && (
+              <Descriptions title="其他信息" bordered column={1} size="small" style={{ marginTop: 16 }}>
+                <Descriptions.Item label="Nonce">{selectedRecord.nonce}</Descriptions.Item>
+              </Descriptions>
+            )}
 
             {selectedRecord.priorities && Array.isArray(selectedRecord.priorities) && selectedRecord.priorities.length > 0 && (
               <div style={{ marginTop: 16 }}>

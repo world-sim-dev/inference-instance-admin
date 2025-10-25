@@ -230,7 +230,7 @@ const instances = await InstanceApi.getInstances({
   page: 1,
   limit: 20,
   search: 'test',
-  status: ['active', 'pending'],
+  status: ['active', 'inactive'],
   sort_by: 'created_at',
   sort_order: 'desc'
 });
@@ -969,7 +969,6 @@ export interface Instance {
 }
 
 export type InstanceStatus = 
-  | 'pending' 
   | 'active' 
   | 'inactive' 
   | 'error' 

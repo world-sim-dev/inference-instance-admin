@@ -150,23 +150,7 @@ describe('InstanceTable', () => {
       expect(statusTag.closest('.ant-tag')).toHaveClass('ant-tag');
     });
 
-    it('should display error status correctly', () => {
-      const instance = createMockInstance({ status: Status.ERROR });
-      renderWithProviders(<InstanceTable {...defaultProps} instances={[instance]} />);
 
-      const statusTag = screen.getByText('ERROR');
-      expect(statusTag).toBeInTheDocument();
-      expect(statusTag.closest('.ant-tag')).toHaveClass('ant-tag-red');
-    });
-
-    it('should display pending status correctly', () => {
-      const instance = createMockInstance({ status: Status.PENDING });
-      renderWithProviders(<InstanceTable {...defaultProps} instances={[instance]} />);
-
-      const statusTag = screen.getByText('PENDING');
-      expect(statusTag).toBeInTheDocument();
-      expect(statusTag.closest('.ant-tag')).toHaveClass('ant-tag-orange');
-    });
   });
 
   describe('actions', () => {
@@ -331,15 +315,15 @@ describe('InstanceTable', () => {
       expect(dataRow).toHaveClass('ephemeral-instance');
     });
 
-    it('should apply error class to error instances', () => {
-      const errorInstance = createMockInstance({ status: Status.ERROR });
-      renderWithProviders(<InstanceTable {...defaultProps} instances={[errorInstance]} />);
+    it('should apply inactive class to inactive instances', () => {
+      const inactiveInstance = createMockInstance({ status: Status.INACTIVE });
+      renderWithProviders(<InstanceTable {...defaultProps} instances={[inactiveInstance]} />);
 
       const table = screen.getByRole('table');
       const rows = table.querySelectorAll('tbody tr');
       // Find the actual data row (not measure row)
       const dataRow = Array.from(rows).find(row => !row.classList.contains('ant-table-measure-row'));
-      expect(dataRow).toHaveClass('error-instance');
+      expect(dataRow).toHaveClass('inactive-instance');
     });
   });
 

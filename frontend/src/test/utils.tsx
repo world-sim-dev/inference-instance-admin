@@ -380,7 +380,7 @@ export const complexMockData = {
 
   // Diverse data for filtering tests
   createDiverseInstanceDataset: () => {
-    const statuses = ['active', 'inactive', 'pending', 'error'];
+    const statuses = ['active', 'inactive'];
     const clusters = ['prod-cluster', 'test-cluster', 'dev-cluster', 'staging-cluster'];
     const models = ['gpt-4', 'claude-3', 'llama-2', 'mistral-7b'];
 

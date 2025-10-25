@@ -38,7 +38,7 @@ const generateMockHistoryData = (count: number = 50): HistoryRecord[] => {
   const operations = ['create', 'update', 'delete', 'rollback'];
   const models = ['gpt-4', 'claude-3', 'llama-2', 'mistral-7b'];
   const clusters = ['prod-cluster-1', 'dev-cluster-2', 'test-cluster-3'];
-  const statuses = ['active', 'inactive', 'pending', 'error'];
+  const statuses = ['active', 'inactive'];
   
   return Array.from({ length: count }, (_, index) => ({
     history_id: index + 1,
