@@ -57,8 +57,8 @@ BACKEND_ONLY=false
 FRONTEND_ONLY=false
 PRODUCTION_MODE=false
 SKIP_INSTALL=false
-BACKEND_PORT=8000
-FRONTEND_PORT=5173
+BACKEND_PORT=38000
+FRONTEND_PORT=33000
 
 # 解析命令行参数
 while [[ $# -gt 0 ]]; do
@@ -214,7 +214,7 @@ setup_frontend() {
 VITE_APP_TITLE=Inference Dashboard (Dev)
 VITE_API_BASE_URL=http://localhost:${BACKEND_PORT}
 VITE_ENABLE_MOCK_API=false
- _LOG_LEVEL=debug
+VITE_LOG_LEVEL=debug
 VITE_ENABLE_DEVTOOLS=true
 EOF
     fi
@@ -254,11 +254,16 @@ start_frontend() {
     
     if [[ "$PRODUCTION_MODE" == true ]]; then
         # 生产模式：构建并使用nginx或静态服务器
-        log_info "构建前端应用..."
+        log_info "构建前端应用 (使用 .env.production)..."
+        
+        # 清理旧的构建文件
+        rm -rf dist
+        
+        # 跳过 prebuild hooks (lint/format检查)，使用 build:prod:fast
         if [ -f "yarn.lock" ]; then
-            yarn build
+            yarn build:prod:fast
         else
-            npm run build
+            npm run build:prod:fast
         fi
         
         # 使用简单的静态服务器

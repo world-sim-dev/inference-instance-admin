@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
-import { Layout, Typography, Space, Button, Dropdown, Avatar, Drawer } from 'antd';
+import { Layout, Typography, Space, Button, Dropdown, Avatar, Drawer, Modal, message } from 'antd';
 import { 
   UserOutlined, 
   SettingOutlined, 
   LogoutOutlined,
   ReloadOutlined,
-  MenuOutlined
+  MenuOutlined,
+  ExclamationCircleOutlined
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { APP_CONFIG } from '../../constants';
 import { useAppContext } from '../../contexts';
+import { useAuthContext } from '../../contexts/useAuthContext';
 import { useResponsive } from '../../hooks';
 
 const { Header } = Layout;
@@ -17,6 +19,7 @@ const { Title } = Typography;
 
 export const AppHeader: React.FC = () => {
   const { dispatch, state } = useAppContext();
+  const { state: authState, logout } = useAuthContext();
   const { isMobile } = useResponsive();
   const [mobileMenuVisible, setMobileMenuVisible] = useState(false);
 
@@ -24,6 +27,32 @@ export const AppHeader: React.FC = () => {
     dispatch({ type: 'LOAD_INSTANCES_START' });
     // This will trigger a refetch in the Dashboard component
     window.location.reload();
+  };
+
+  /**
+   * Handle logout action with confirmation
+   */
+  const handleLogout = () => {
+    Modal.confirm({
+      title: '确认退出',
+      icon: <ExclamationCircleOutlined />,
+      content: '确定要退出登录吗？退出后将清除本地会话信息。',
+      okText: '确定退出',
+      cancelText: '取消',
+      okType: 'danger',
+      onOk: () => {
+        return new Promise((resolve) => {
+          try {
+            logout();
+            message.success('已成功退出登录');
+            resolve(true);
+          } catch (error) {
+            message.error('退出登录失败');
+            resolve(false);
+          }
+        });
+      },
+    });
   };
 
   const userMenuItems: MenuProps['items'] = [
@@ -47,11 +76,10 @@ export const AppHeader: React.FC = () => {
     switch (key) {
       case 'settings':
         // TODO: Open settings modal
-        console.log('Open settings');
+        message.info('设置功能开发中...');
         break;
       case 'logout':
-        // TODO: Handle logout
-        console.log('Logout');
+        handleLogout();
         break;
     }
   };
@@ -90,8 +118,11 @@ export const AppHeader: React.FC = () => {
               type="text"
               className="header-user-btn"
               icon={<Avatar size="small" icon={<UserOutlined />} />}
+              title={authState.credentials?.username || '管理员'}
             >
-              <span className="header-user-text">管理员</span>
+              <span className="header-user-text">
+                {authState.credentials?.username || '管理员'}
+              </span>
             </Button>
           </Dropdown>
         </Space>

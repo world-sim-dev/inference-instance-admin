@@ -86,7 +86,20 @@ rate_limiter = RateLimiter()
 class SecurityMiddleware(BaseHTTPMiddleware):
     """Security middleware for rate limiting and logging"""
     
+    def add_cors_headers(self, response: Response) -> Response:
+        """Add CORS headers to allow all origins"""
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        response.headers["Access-Control-Allow-Methods"] = "*"
+        response.headers["Access-Control-Allow-Headers"] = "*"
+        response.headers["Access-Control-Max-Age"] = "86400"
+        return response
+
     async def dispatch(self, request: Request, call_next) -> Response:
+        # Handle CORS preflight requests
+        if request.method == "OPTIONS":
+            response = Response(status_code=200)
+            return self.add_cors_headers(response)
+        
         # Get client IP
         client_ip = self.get_client_ip(request)
         
@@ -160,6 +173,9 @@ class SecurityMiddleware(BaseHTTPMiddleware):
             response.headers["X-Frame-Options"] = "DENY"
             response.headers["X-XSS-Protection"] = "1; mode=block"
             response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+            
+            # Add CORS headers to all responses
+            self.add_cors_headers(response)
             
             return response
             

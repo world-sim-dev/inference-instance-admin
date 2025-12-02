@@ -259,7 +259,7 @@ export const useOperationFeedback = () => {
   const { showSuccess, showError, showLoading, updateLoadingSuccess, updateLoadingError } = useNotification();
   const [loadingKey, setLoadingKey] = useState<string | null>(null);
 
-  const showOperationFeedback = useCallback(async <T>(
+  const showOperationFeedback = useCallback(async <T,>(
     operation: () => Promise<T>,
     feedback: OperationFeedback,
     options?: {

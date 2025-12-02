@@ -1,0 +1,48 @@
+[Unit]
+Description=Inference Instance Admin Frontend Service
+Documentation=https://github.com/your-org/inference-instance-admin
+After=network.target inference-admin.service
+Wants=inference-admin.service
+
+[Service]
+Type=simple
+User=root
+Group=root
+WorkingDirectory=/root/inference-instance-admin/frontend/dist
+
+# Environment variables
+Environment="PORT=33000"
+
+# Start command - using Python http.server for production
+# For better performance, consider using nginx or serve
+ExecStart=/usr/bin/python3 -m http.server 33000 --bind 0.0.0.0
+
+# Alternative: using npx serve (requires Node.js)
+# ExecStart=/usr/bin/npx serve -s /root/inference-instance-admin/frontend/dist -l 33000 --no-port-switching
+
+# Restart policy
+Restart=always
+RestartSec=10
+StartLimitInterval=300
+StartLimitBurst=5
+
+# Resource limits
+LimitNOFILE=65535
+
+# Security
+NoNewPrivileges=true
+PrivateTmp=true
+ReadOnlyPaths=/root/inference-instance-admin/frontend/dist
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=inference-admin-frontend
+
+# Graceful shutdown
+TimeoutStopSec=10
+KillMode=mixed
+
+[Install]
+WantedBy=multi-user.target
+

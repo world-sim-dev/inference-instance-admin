@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     
     # Authentication Configuration
     auth_username: str = "admin"
-    auth_password_hash: str = "$2b$12$UKaYdrSkZRYQe8DtbjnLa.D37NzLS.4PNInZIzRlAubyyKe7sb/dy"
+    auth_password_hash: str = "$2b$12$7Pyo6KMdet23vFGsryVB3.qWee/mVbOHN2n8/77m3lGrctWAn7zlK"
     auth_rate_limit: int = 10  # requests per minute
     auth_session_timeout: int = 3600  # seconds
     auth_max_retry_attempts: int = 3

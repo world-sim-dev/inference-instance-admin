@@ -9,7 +9,7 @@ from pydantic import BaseModel
 
 from auth import authenticate, security
 
-router = APIRouter(prefix="/api/auth", tags=["authentication"])
+router = APIRouter(tags=["authentication"])
 
 
 class AuthResponse(BaseModel):
@@ -26,7 +26,8 @@ class AuthError(BaseModel):
     error_code: str
 
 
-@router.post("/verify", response_model=AuthResponse)
+@router.post("/auth/verify", response_model=AuthResponse)
+@router.post("/api/auth/verify", response_model=AuthResponse)
 async def verify_credentials(
     request: Request,
     credentials: HTTPBasicCredentials = Depends(security)
@@ -89,7 +90,8 @@ def get_authenticated_user(request: Request, credentials: HTTPBasicCredentials =
     """Dependency to get authenticated user with request context."""
     return authenticate(credentials, request)
 
-@router.get("/status")
+@router.get("/auth/status")
+@router.get("/api/auth/status")
 async def auth_status(
     request: Request,
     current_user: str = Depends(get_authenticated_user)

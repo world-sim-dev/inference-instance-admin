@@ -20,6 +20,7 @@ from database import init_db
 from api.instances import router as instances_router
 from api.history import router as history_router
 from api.auth import router as auth_router
+from api.monitoring import router as monitoring_router
 from middleware import SecurityMiddleware
 
 # Configure logging
@@ -90,20 +91,18 @@ app = FastAPI(
 )
 
 
-# Add security middleware first (order matters)
-app.add_middleware(SecurityMiddleware)
-
-# Configure CORS
-# Get allowed origins from environment or use defaults
-allowed_origins = os.getenv("CORS_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000,http://localhost:5173,http://127.0.0.1:5173").split(",")
-
+# CORS - 允许所有跨域请求
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins,
-    allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
+
+# Add security middleware
+app.add_middleware(SecurityMiddleware)
 
 # Mount static files
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -120,6 +119,7 @@ templates = Jinja2Templates(directory="templates")
 app.include_router(auth_router)
 app.include_router(instances_router)
 app.include_router(history_router)
+app.include_router(monitoring_router)
 
 
 # Global exception handler

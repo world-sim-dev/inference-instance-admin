@@ -4,10 +4,12 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Layout, Card, Button, Space, Typography, Alert, Spin, Table, Tag, Input, Modal, Descriptions, Divider, Form, InputNumber, Select, Switch, message } from 'antd';
-import { PlusOutlined, ReloadOutlined, EyeOutlined, EditOutlined, DeleteOutlined, HistoryOutlined, SearchOutlined, CloseOutlined, SaveOutlined, CopyOutlined } from '@ant-design/icons';
+import { Layout, Card, Button, Space, Typography, Alert, Spin, Table, Tag, Input, Modal, Descriptions, Divider, Form, InputNumber, Select, Switch, message, Dropdown, Avatar } from 'antd';
+import { PlusOutlined, ReloadOutlined, EyeOutlined, EditOutlined, DeleteOutlined, HistoryOutlined, SearchOutlined, CloseOutlined, SaveOutlined, CopyOutlined, UserOutlined, LogoutOutlined, SettingOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import type { MenuProps } from 'antd';
 import { CreateInstanceModal } from '../components/modals/CreateInstanceModal';
 import { useAppContext } from '../contexts/useAppContext';
+import { useAuthContext } from '../contexts/useAuthContext';
 import { useQuery } from '@tanstack/react-query';
 import { HistoryModal } from '../components/modals/HistoryModal';
 import { apiClient } from '../services/api';
@@ -21,7 +23,16 @@ const fetchInstances = async () => {
 };
 
 export const WorkingDashboard: React.FC = () => {
+  // 组件加载时立即输出日志
+  console.log('🎉 WorkingDashboard loaded - NEW VERSION with logout!');
+  console.log('Component mount time:', new Date().toLocaleTimeString());
+  
   const { state } = useAppContext();
+  const { state: authState, logout } = useAuthContext();
+  
+  console.log('✅ authState initialized:', authState);
+  console.log('✅ logout function available:', typeof logout);
+  
   const [searchText, setSearchText] = useState('');
   const [selectedInstance, setSelectedInstance] = useState<any>(null);
   const [detailsModalVisible, setDetailsModalVisible] = useState(false);
@@ -38,7 +49,8 @@ export const WorkingDashboard: React.FC = () => {
   } = useQuery({
     queryKey: ['instances'],
     queryFn: fetchInstances,
-    refetchInterval: 30000, // Refetch every 30 seconds
+    // Auto refresh disabled - users can manually refresh if needed
+    // refetchInterval: 30000,
   });
 
   // Filter instances based on search text
@@ -54,6 +66,71 @@ export const WorkingDashboard: React.FC = () => {
 
   const handleCreateInstance = () => {
     setCreateModalVisible(true);
+  };
+
+  /**
+   * Handle logout action with confirmation
+   */
+  const handleLogout = () => {
+    alert('handleLogout 函数被调用了！');
+    console.log('handleLogout called');
+    console.log('logout function:', logout);
+    console.log('authState:', authState);
+    
+    // 先测试简单的确认框
+    const confirmed = window.confirm('确定要退出登录吗？退出后将清除本地会话信息。');
+    
+    if (confirmed) {
+      alert('用户点击了确定，准备执行退出');
+      try {
+        console.log('Executing logout...');
+        logout();
+        message.success('已成功退出登录');
+        console.log('Logout successful');
+      } catch (error) {
+        console.error('Logout error:', error);
+        message.error('退出登录失败: ' + error);
+        alert('退出失败: ' + error);
+      }
+    } else {
+      alert('用户取消了退出');
+    }
+  };
+
+  // User menu items
+  const userMenuItems: MenuProps['items'] = [
+    {
+      key: 'settings',
+      icon: <SettingOutlined />,
+      label: '设置',
+    },
+    {
+      type: 'divider',
+    },
+    {
+      key: 'logout',
+      icon: <LogoutOutlined />,
+      label: '退出登录',
+      danger: true,
+    },
+  ];
+
+  const handleUserMenuClick: MenuProps['onClick'] = ({ key }) => {
+    // 使用 alert 进行调试
+    alert('菜单点击: ' + key);
+    console.log('Menu clicked:', key);
+    switch (key) {
+      case 'settings':
+        message.info('设置功能开发中...');
+        break;
+      case 'logout':
+        alert('准备调用 handleLogout');
+        console.log('Calling handleLogout...');
+        handleLogout();
+        break;
+      default:
+        console.log('Unknown menu key:', key);
+    }
   };
 
   const handleCreateSuccess = (instance: any) => {
@@ -294,6 +371,26 @@ export const WorkingDashboard: React.FC = () => {
           >
             刷新
           </Button>
+          
+          <Dropdown
+            menu={{
+              items: userMenuItems,
+              onClick: handleUserMenuClick,
+            }}
+            placement="bottomRight"
+            trigger={['click']}
+          >
+            <Button
+              type="text"
+              style={{ color: 'white' }}
+              icon={<Avatar size="small" icon={<UserOutlined />} style={{ backgroundColor: '#1890ff' }} />}
+              title={authState.credentials?.username || '管理员'}
+            >
+              <span style={{ marginLeft: 8 }}>
+                {authState.credentials?.username || '管理员'}
+              </span>
+            </Button>
+          </Dropdown>
         </Space>
       </Header>
       

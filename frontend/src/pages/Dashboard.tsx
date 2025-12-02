@@ -24,6 +24,7 @@ const ViewDetailsModal = lazy(() => import('../components/modals/ViewDetailsModa
 const VirtualizedInstanceTable = lazy(() => import('../components/tables/VirtualizedInstanceTable'));
 import { useInstances } from '../hooks';
 import { useAppContext, useAppActions } from '../contexts/useAppContext';
+import { useAuthContext } from '../contexts/useAuthContext';
 import { usePerformanceMonitor } from '../hooks/usePerformanceMonitor';
 import { useKeyboardShortcuts, createCommonShortcuts } from '../hooks/useKeyboardShortcuts';
 import { useNotification } from '../components/common/NotificationSystem';
@@ -41,6 +42,7 @@ const { Title, Text } = Typography;
  */
 export const Dashboard: React.FC = React.memo(() => {
   const { state } = useAppContext();
+  const { state: authState } = useAuthContext();
   const actions = useAppActions();
   const {
     filteredInstances,
@@ -236,6 +238,31 @@ export const Dashboard: React.FC = React.memo(() => {
       message.info('自动刷新已开启 (30秒间隔)');
     }
   }, [autoRefresh, refreshInterval, refetch]);
+
+  /**
+   * Clean up auto refresh interval when component unmounts or user logs out
+   */
+  useEffect(() => {
+    // Clean up on unmount or logout
+    return () => {
+      if (refreshInterval) {
+        clearInterval(refreshInterval);
+        setRefreshInterval(null);
+      }
+    };
+  }, [refreshInterval]);
+
+  /**
+   * Stop auto refresh when user logs out
+   */
+  useEffect(() => {
+    if (!authState.isAuthenticated && refreshInterval) {
+      clearInterval(refreshInterval);
+      setRefreshInterval(null);
+      setAutoRefresh(false);
+      console.log('Auto refresh stopped due to logout');
+    }
+  }, [authState.isAuthenticated, refreshInterval]);
 
   /**
    * Handle modal close

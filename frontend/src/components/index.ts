@@ -1,5 +1,5 @@
 export { ErrorBoundary } from './ErrorBoundary';
-export { StateDemo } from './StateDemo';
+// export { StateDemo } from './StateDemo'; // Commented out - file doesn't exist
 export * from './Layout';
 export * from './common';
 export * from './tables';
