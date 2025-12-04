@@ -242,14 +242,21 @@ export const InstanceForm: React.FC<InstanceFormProps> = ({
           </Col>
           <Col xs={24} sm={12}>
             <Form.Item
-              name="model_version"
-              label="模型版本"
+              name="replicas"
+              label={
+                <span>
+                  副本数
+                  <Tooltip title="实例副本数量，用于负载均衡">
+                    <InfoCircleOutlined style={{ marginLeft: 4 }} />
+                  </Tooltip>
+                </span>
+              }
               rules={[
-                { required: true, message: '请输入模型版本' },
-                { min: 1, max: 50, message: '模型版本长度应在1-50字符之间' }
+                { required: true, message: '请输入副本数' },
+                { type: 'number', min: 1, message: '副本数不能小于1' }
               ]}
             >
-              <Input placeholder="输入模型版本" />
+              <InputNumber min={1} style={{ width: '100%' }} />
             </Form.Item>
           </Col>
         </Row>
@@ -517,47 +524,22 @@ export const InstanceForm: React.FC<InstanceFormProps> = ({
               }
               rules={[
                 { required: true, message: '请输入工作进程数' },
-                { type: 'number', min: 1, max: 32, message: '工作进程数应在1-32之间' },
-                {
-                  validator: (_, value) => {
-                    const replicas = form.getFieldValue('replicas') || 1;
-                    if (value && replicas && value * replicas > 64) {
-                      return Promise.reject(new Error('工作进程数 × 副本数不应超过64'));
-                    }
-                    return Promise.resolve();
-                  }
-                }
+                { type: 'number', min: 1, message: '工作进程数不能小于1' }
               ]}
             >
-              <InputNumber min={1} max={32} style={{ width: '100%' }} />
+              <InputNumber min={1} style={{ width: '100%' }} />
             </Form.Item>
           </Col>
           <Col xs={24} sm={12}>
             <Form.Item
-              name="replicas"
-              label={
-                <span>
-                  副本数
-                  <Tooltip title="实例副本数量，用于负载均衡">
-                    <InfoCircleOutlined style={{ marginLeft: 4 }} />
-                  </Tooltip>
-                </span>
-              }
+              name="model_version"
+              label="模型版本"
               rules={[
-                { required: true, message: '请输入副本数' },
-                { type: 'number', min: 1, message: '副本数不能小于1' },
-                {
-                  validator: (_, value) => {
-                    const nWorkers = form.getFieldValue('n_workers') || 1;
-                    if (value && nWorkers && value * nWorkers > 64) {
-                      return Promise.reject(new Error('副本数 × 工作进程数不应超过64'));
-                    }
-                    return Promise.resolve();
-                  }
-                }
+                { required: true, message: '请输入模型版本' },
+                { min: 1, max: 50, message: '模型版本长度应在1-50字符之间' }
               ]}
             >
-              <InputNumber min={1} max={10} style={{ width: '100%' }} />
+              <Input placeholder="输入模型版本" />
             </Form.Item>
           </Col>
         </Row>

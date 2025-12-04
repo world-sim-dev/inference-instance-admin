@@ -39,6 +39,10 @@ export const WorkingDashboard: React.FC = () => {
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [historyModalVisible, setHistoryModalVisible] = useState(false);
+  const [pageSize, setPageSize] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedModels, setSelectedModels] = useState<string[]>([]);
+  const [selectedClusters, setSelectedClusters] = useState<string[]>([]);
   
   // Use React Query to fetch instances
   const { 
@@ -53,12 +57,41 @@ export const WorkingDashboard: React.FC = () => {
     // refetchInterval: 30000,
   });
 
-  // Filter instances based on search text
-  const filteredInstances = instances?.filter((instance: any) =>
-    instance.name.toLowerCase().includes(searchText.toLowerCase()) ||
-    instance.model_name.toLowerCase().includes(searchText.toLowerCase()) ||
-    instance.cluster_name.toLowerCase().includes(searchText.toLowerCase())
-  ) || [];
+  // 从实例数据中提取唯一的模型和集群列表
+  const availableModels = React.useMemo(() => {
+    if (!instances) return [];
+    const models = new Set(instances.map((inst: any) => inst.model_name));
+    return Array.from(models).sort();
+  }, [instances]);
+
+  const availableClusters = React.useMemo(() => {
+    if (!instances) return [];
+    const clusters = new Set(instances.map((inst: any) => inst.cluster_name));
+    return Array.from(clusters).sort();
+  }, [instances]);
+
+  // Filter instances based on search text, selected models, and selected clusters
+  const filteredInstances = React.useMemo(() => {
+    if (!instances) return [];
+    
+    return instances.filter((instance: any) => {
+      // 搜索文本过滤
+      const matchesSearch = !searchText || 
+        instance.name.toLowerCase().includes(searchText.toLowerCase()) ||
+        instance.model_name.toLowerCase().includes(searchText.toLowerCase()) ||
+        instance.cluster_name.toLowerCase().includes(searchText.toLowerCase());
+      
+      // 模型过滤
+      const matchesModel = selectedModels.length === 0 || 
+        selectedModels.includes(instance.model_name);
+      
+      // 集群过滤
+      const matchesCluster = selectedClusters.length === 0 || 
+        selectedClusters.includes(instance.cluster_name);
+      
+      return matchesSearch && matchesModel && matchesCluster;
+    });
+  }, [instances, searchText, selectedModels, selectedClusters]);
 
   const handleRefresh = () => {
     refetch();
@@ -243,11 +276,12 @@ export const WorkingDashboard: React.FC = () => {
       sorter: (a: any, b: any) => a.model_name.localeCompare(b.model_name),
     },
     {
-      title: '版本',
-      dataIndex: 'model_version',
-      key: 'model_version',
+      title: '副本数',
+      dataIndex: 'replicas',
+      key: 'replicas',
       width: 80,
       ellipsis: true,
+      sorter: (a: any, b: any) => a.replicas - b.replicas,
     },
     {
       title: '集群',
@@ -435,7 +469,7 @@ export const WorkingDashboard: React.FC = () => {
             
             <Card 
               title={
-                <Space>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
                   <span>{`实例列表 (${filteredInstances.length}/${instances?.length || 0})`}</span>
                   <Input
                     placeholder="搜索实例名称、模型或集群..."
@@ -445,7 +479,37 @@ export const WorkingDashboard: React.FC = () => {
                     style={{ width: 300 }}
                     allowClear
                   />
-                </Space>
+                  <Select
+                    mode="multiple"
+                    placeholder="模型"
+                    value={selectedModels}
+                    onChange={setSelectedModels}
+                    style={{ minWidth: 150 }}
+                    allowClear
+                    maxTagCount="responsive"
+                  >
+                    {availableModels.map((model: string) => (
+                      <Select.Option key={model} value={model}>
+                        {model}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                  <Select
+                    mode="multiple"
+                    placeholder="集群"
+                    value={selectedClusters}
+                    onChange={setSelectedClusters}
+                    style={{ minWidth: 150 }}
+                    allowClear
+                    maxTagCount="responsive"
+                  >
+                    {availableClusters.map((cluster: string) => (
+                      <Select.Option key={cluster} value={cluster}>
+                        {cluster}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                </div>
               }
               extra={
                 <Button 
@@ -463,11 +527,20 @@ export const WorkingDashboard: React.FC = () => {
                 loading={isLoading}
                 rowKey="id"
                 pagination={{
-                  pageSize: 10,
+                  current: currentPage,
+                  pageSize: pageSize,
                   showSizeChanger: true,
                   showQuickJumper: true,
+                  pageSizeOptions: ['10', '20', '50', '100'],
                   showTotal: (total, range) => 
                     `第 ${range[0]}-${range[1]} 条，共 ${total} 条`,
+                  onChange: (page, newPageSize) => {
+                    setCurrentPage(page);
+                    if (newPageSize !== pageSize) {
+                      setPageSize(newPageSize);
+                      setCurrentPage(1); // 切换每页条数时重置到第一页
+                    }
+                  },
                 }}
                 scroll={{ x: 1200 }}
                 size="small"
@@ -512,8 +585,8 @@ export const WorkingDashboard: React.FC = () => {
               <Descriptions.Item label="模型名称">
                 {selectedInstance.model_name}
               </Descriptions.Item>
-              <Descriptions.Item label="模型版本">
-                {selectedInstance.model_version || 'latest'}
+              <Descriptions.Item label="副本数">
+                {selectedInstance.replicas}
               </Descriptions.Item>
               <Descriptions.Item label="集群名称">
                 {selectedInstance.cluster_name}
@@ -546,8 +619,8 @@ export const WorkingDashboard: React.FC = () => {
               <Descriptions.Item label="工作进程数">
                 {selectedInstance.n_workers}
               </Descriptions.Item>
-              <Descriptions.Item label="副本数">
-                {selectedInstance.replicas}
+              <Descriptions.Item label="模型版本">
+                {selectedInstance.model_version || 'latest'}
               </Descriptions.Item>
               <Descriptions.Item label="任务并发数">
                 {selectedInstance.task_concurrency}
