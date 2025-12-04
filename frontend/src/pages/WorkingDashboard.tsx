@@ -105,7 +105,6 @@ export const WorkingDashboard: React.FC = () => {
    * Handle logout action with confirmation
    */
   const handleLogout = () => {
-    alert('handleLogout 函数被调用了！');
     console.log('handleLogout called');
     console.log('logout function:', logout);
     console.log('authState:', authState);
@@ -114,7 +113,6 @@ export const WorkingDashboard: React.FC = () => {
     const confirmed = window.confirm('确定要退出登录吗？退出后将清除本地会话信息。');
     
     if (confirmed) {
-      alert('用户点击了确定，准备执行退出');
       try {
         console.log('Executing logout...');
         logout();
@@ -149,15 +147,12 @@ export const WorkingDashboard: React.FC = () => {
   ];
 
   const handleUserMenuClick: MenuProps['onClick'] = ({ key }) => {
-    // 使用 alert 进行调试
-    alert('菜单点击: ' + key);
     console.log('Menu clicked:', key);
     switch (key) {
       case 'settings':
         message.info('设置功能开发中...');
         break;
       case 'logout':
-        alert('准备调用 handleLogout');
         console.log('Calling handleLogout...');
         handleLogout();
         break;
